@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   Search, Bookmark, X, MapPin, 
   Phone, ChevronRight, ArrowLeft,
-  Utensils, Wine
+  Utensils, Wine, Instagram
 } from 'lucide-react';
 
 // --- ДАНІ МЕНЮ (Категорії з PDF + Коктейлі з Фото) ---
@@ -166,7 +166,7 @@ const menuCategories = [
       { name: 'Львівська Преміум', desc: '', weight: '50г / 0.7л', price: '45 / 450 грн' }
   ]},
   { section: 'bar', id: 'cognac', name: 'Коньяк', defaultImage: images.alcohol, items: [
-      { name: 'ΜΕΤΑΧА 5*', desc: '', weight: '50г / 0.5л', price: '70 / 570 грн' },
+      { name: 'ΜΕТАХА 5*', desc: '', weight: '50г / 0.5л', price: '70 / 570 грн' },
       { name: 'Старий Кахеті 5*', desc: '', weight: '50г / 0.5л', price: '50 / 450 грн' },
       { name: 'Азнаурі 5*', desc: '', weight: '50г / 0.5л', price: '50 / 450 грн' },
       { name: 'Александріон 5*', desc: '', weight: '50г / 0.5л', price: '50 / 450 грн' }
@@ -220,7 +220,7 @@ export default function App() {
   // Завантаження закладок
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('romantic_desktop_premium_fixed');
+      const saved = localStorage.getItem('romantic_desktop_premium_fixed_v2');
       if (saved) setBookmarks(JSON.parse(saved));
     } catch (e) {}
   }, []);
@@ -236,27 +236,40 @@ export default function App() {
     }
     setBookmarks(updated);
     try {
-      localStorage.setItem('romantic_desktop_premium_fixed', JSON.stringify(updated));
+      localStorage.setItem('romantic_desktop_premium_fixed_v2', JSON.stringify(updated));
     } catch (e) {}
   };
 
-  // Робота з меню
+  // Робота з меню та перемиканням розділів
   const handleOpenMenu = (section) => {
+    isManualScrollingRef.current = true;
     setMenuSection(section);
     const firstCat = menuCategories.find(c => c.section === section);
     if (firstCat) setActiveCategory(firstCat.id);
     setSearchQuery('');
     setView('menu');
-    setTimeout(() => window.scrollTo({top: 0, behavior: 'instant'}), 20);
+    window.scrollTo({top: 0, behavior: 'instant'});
+    
+    setTimeout(() => {
+      isManualScrollingRef.current = false;
+    }, 200);
   };
 
   const handleSectionSwitch = (section) => {
+    isManualScrollingRef.current = true;
     setMenuSection(section);
     const firstCat = menuCategories.find(c => c.section === section);
     if (firstCat) setActiveCategory(firstCat.id);
     setSearchQuery('');
     setShowSectionModal(false);
-    setTimeout(() => window.scrollTo({top: 0, behavior: 'instant'}), 20);
+    window.scrollTo({top: 0, behavior: 'instant'});
+
+    // Центрування таб-скролу для мобільних
+    setTimeout(() => {
+      const container = document.getElementById('tabs-container');
+      if (container) container.scrollTo({ left: 0, behavior: 'instant' });
+      isManualScrollingRef.current = false;
+    }, 200);
   };
 
   // SCROLL-SPY: Підсвічування категорії під час гортання
@@ -274,12 +287,19 @@ export default function App() {
         const cat = currentSectionCategories[i];
         const el = document.getElementById(`cat-${cat.id}`);
         if (el) {
-          const elTop = el.getBoundingClientRect().top + scrollY;
-          if (scrollY >= elTop - headerOffset - 30) {
+          const rect = el.getBoundingClientRect();
+          // Якщо верхня межа елемента перетнула лінію шапки
+          if (rect.top <= headerOffset + 40) {
             newActive = cat.id;
             break;
           }
         }
+      }
+
+      // Перевірка на досягнення самого низу сторінки (щоб остання категорія теж підсвічувалася)
+      const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 60;
+      if (isAtBottom && currentSectionCategories.length > 0) {
+        newActive = currentSectionCategories[currentSectionCategories.length - 1].id;
       }
 
       if (newActive !== activeCategory && newActive !== 'favorites') {
@@ -295,7 +315,7 @@ export default function App() {
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [view, searchQuery, currentSectionCategories, activeCategory]);
+  }, [view, searchQuery, currentSectionCategories, activeCategory, menuSection]);
 
   // Ручний скрол до категорії
   const scrollToCategory = (id) => {
@@ -309,7 +329,7 @@ export default function App() {
       const el = document.getElementById(`cat-${id}`);
       if (el) {
         const offset = window.innerWidth >= 1024 ? 100 : 160; 
-        const top = el.getBoundingClientRect().top + window.scrollY - offset;
+        const top = el.offsetTop - offset;
         window.scrollTo({ top, behavior: 'smooth' });
       }
     }
@@ -322,10 +342,10 @@ export default function App() {
       container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
     }
 
-    // Тимчасово блокуємо ScrollSpy, щоб уникнути стрибків екрана під час анімації скролу
+    // Блокуємо ScrollSpy, щоб уникнути стрибків екрана під час анімації скролу
     setTimeout(() => {
       isManualScrollingRef.current = false;
-    }, 900);
+    }, 950);
   };
 
   // Блокування фонового скролу при відкритому Bottom Sheet
@@ -410,7 +430,7 @@ export default function App() {
                 </div>
                 <div className="flex gap-5 items-center">
                   <div className="w-12 h-12 rounded-full bg-[#FCFAF8] flex items-center justify-center border border-[#F3EFEA]">
-                    <Phone className="text-[#967259] w-5 h-5" />
+                    <Instagram className="text-[#967259] w-5 h-5" />
                   </div>
                   <div>
                     <p className="text-[#A99F93] text-xs uppercase tracking-widest font-bold mb-1">Instagram</p>
@@ -457,8 +477,8 @@ export default function App() {
 
         <div className="p-6">
           <div className="flex bg-[#FCFAF8] p-1.5 rounded-full border border-[#E8DCC4]/50 mb-6">
-            <button onClick={() => { setMenuSection('food'); scrollToCategory(menuCategories.find(c => c.section === 'food')?.id); }} className={`flex-1 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${menuSection === 'food' ? 'bg-white shadow-sm text-[#967259]' : 'text-[#8A7969] hover:text-[#2C2621]'}`}>Кухня</button>
-            <button onClick={() => { setMenuSection('bar'); scrollToCategory(menuCategories.find(c => c.section === 'bar')?.id); }} className={`flex-1 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${menuSection === 'bar' ? 'bg-white shadow-sm text-[#967259]' : 'text-[#8A7969] hover:text-[#2C2621]'}`}>Бар</button>
+            <button onClick={() => handleSectionSwitch('food')} className={`flex-1 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${menuSection === 'food' ? 'bg-white shadow-sm text-[#967259]' : 'text-[#8A7969] hover:text-[#2C2621]'}`}>Кухня</button>
+            <button onClick={() => handleSectionSwitch('bar')} className={`flex-1 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${menuSection === 'bar' ? 'bg-white shadow-sm text-[#967259]' : 'text-[#8A7969] hover:text-[#2C2621]'}`}>Бар</button>
           </div>
 
           <nav className="flex flex-col gap-1 overflow-y-auto max-h-[calc(100vh-320px)] no-scrollbar pr-2">
@@ -509,8 +529,8 @@ export default function App() {
           </div>
 
           <div className="flex bg-[#FCFAF8] p-1 rounded-full border border-[#E8DCC4]/50 mb-3">
-            <button onClick={() => { setMenuSection('food'); scrollToCategory(menuCategories.find(c => c.section === 'food')?.id); }} className={`flex-1 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${menuSection === 'food' ? 'bg-white shadow-sm text-[#967259]' : 'text-[#8A7969]'}`}>Кухня</button>
-            <button onClick={() => { setMenuSection('bar'); scrollToCategory(menuCategories.find(c => c.section === 'bar')?.id); }} className={`flex-1 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${menuSection === 'bar' ? 'bg-white shadow-sm text-[#967259]' : 'text-[#8A7969]'}`}>Бар</button>
+            <button onClick={() => handleSectionSwitch('food')} className={`flex-1 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${menuSection === 'food' ? 'bg-white shadow-sm text-[#967259]' : 'text-[#8A7969]'}`}>Кухня</button>
+            <button onClick={() => handleSectionSwitch('bar')} className={`flex-1 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${menuSection === 'bar' ? 'bg-white shadow-sm text-[#967259]' : 'text-[#8A7969]'}`}>Бар</button>
           </div>
 
           {/* Горизонтальні вкладки на мобілці */}
