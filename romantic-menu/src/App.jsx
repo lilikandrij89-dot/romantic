@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   Search, Bookmark, X, MapPin, 
   Phone, ChevronRight, ArrowLeft,
-  Utensils, Wine,
+  Utensils, Wine
 } from 'lucide-react';
 
 // --- ДАНІ МЕНЮ ---
@@ -25,7 +25,7 @@ const images = {
 const menuCategories = [
   // --- КУХНЯ ---
   { section: 'food', id: 'pizza', name: 'Піца', defaultImage: images.pizza, items: [
-      { name: 'ROMANTIC', desc: 'соус, салямі, сир твердий, сир моцарела, ковбаса мисливська, яйце, пармезан', weight: '500г / 800г', price: '190 / 340 грн', image: '' },
+      { name: 'ROMANTIC', desc: 'соус, салямі, сир твердий, сир моцарела, ковбаса мисливська, яйце, пармезан', weight: '500г / 800г', price: '190 / 340 грн', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1HLt964JQLk0k-6rKs389WMjtwgYNyWggsg&s' },
       { name: 'Чотири сири', desc: 'соус, сир фета, сир твердий, сир моцарела, сир пармезан', weight: '500г / 800г', price: '190 / 340 грн', image: '' },
       { name: 'Квадро формаджі', desc: 'соус, дор блю, сир твердий, сир моцарела, сир пармезан', weight: '500г / 800г', price: '220 / 370 грн', image: '' },
       { name: 'Буфало', desc: 'соус, куряче філе, сир моцарела, помідори, сир твердий', weight: '500г / 800г', price: '190 / 340 грн', image: '' },
@@ -59,7 +59,7 @@ const menuCategories = [
       { name: 'Брускети з прошутто', desc: '', weight: '3 шт.', price: '150 грн', image: '' },
       { name: 'Сет брускет', desc: 'з лососем, помідорами, прошутто', weight: '3 шт.', price: '380 грн', image: '' },
       { name: 'Козацька закуска', desc: 'сало, підчеревина, грінки хлібні, бринза, часник', weight: '400 г', price: '350 грн', image: '' },
-      { name: "М'ясна нарізка", desc: 'прошутто, шинка, салямі 3-х видів', weight: '400 г', price: '480 грн', image: '' },
+      { name: "М'ясна нарізка", desc: 'proшутто, шинка, салямі 3-х видів', weight: '400 г', price: '480 грн', image: '' },
       { name: 'Сирна нарізка', desc: 'брі, дор блю, пармезан, сир з горіхами, мед', weight: '400 г', price: '500 грн', image: '' },
       { name: 'Оселедець з картоплею', desc: '', weight: '300 г', price: '280 грн', image: '' }
   ]},
@@ -273,16 +273,27 @@ export default function App() {
     const handleScroll = () => {
       if (isManualScrollingRef.current) return;
 
-      const headerOffset = 150; // Висота фіксованої шапки
-      const scrollY = window.scrollY;
+      const headerHeight = 160; 
       let newActive = activeCategory;
+      const categories = menuCategories.filter(c => c.section === menuSection);
 
-      for (let i = currentSectionCategories.length - 1; i >= 0; i--) {
-        const cat = currentSectionCategories[i];
+      for (let i = categories.length - 1; i >= 0; i--) {
+        const cat = categories[i];
         const el = document.getElementById(`cat-${cat.id}`);
-        if (el && scrollY >= el.offsetTop - headerOffset - 20) {
-          newActive = cat.id;
-          break;
+        if (el) {
+          const rect = el.getBoundingClientRect();
+          // If the top of the category container is at or above the header bottom
+          if (rect.top <= headerHeight + 50) {
+            newActive = cat.id;
+            break;
+          }
+        }
+      }
+
+      // Check if scrolled to bottom
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 20) {
+        if (categories.length > 0) {
+          newActive = categories[categories.length - 1].id;
         }
       }
 
@@ -299,7 +310,7 @@ export default function App() {
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [view, searchQuery, activeCategory, currentSectionCategories]);
+  }, [view, searchQuery, activeCategory, menuSection]);
 
   const scrollToCategory = (id) => {
     isManualScrollingRef.current = true;
@@ -313,7 +324,7 @@ export default function App() {
       const el = document.getElementById(`cat-${id}`);
       if (el) {
         const offset = 140; 
-        const top = el.offsetTop - offset;
+        const top = el.getBoundingClientRect().top + window.scrollY - offset;
         window.scrollTo({ top, behavior: 'smooth' });
       }
     }
@@ -410,7 +421,13 @@ export default function App() {
                 </div>
               </div>
               <div className="flex gap-4 items-start">
-                <Phone className="text-[#111827] w-6 h-6 mt-0.5" strokeWidth={1.5} />
+                <div className="w-6 h-6 flex items-center justify-center mt-0.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-[#111827] w-6 h-6">
+                      <rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect>
+                      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                      <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line>
+                    </svg>
+                </div>
                 <div className="pt-0.5 w-[80%]">
                   <p className="text-[#9CA3AF] text-[11px] uppercase tracking-wide font-semibold mb-0.5">Instagram</p>
                   <a href="https://www.instagram.com/romantic_restaurant_strointsi" target="_blank" rel="noopener noreferrer" className="text-[#111827] font-medium text-[15px] hover:underline block truncate">
