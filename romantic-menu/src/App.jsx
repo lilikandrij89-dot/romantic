@@ -63,15 +63,6 @@ const menuCategories = [
       { name: 'Сирна нарізка', desc: 'брі, дор блю, пармезан, сир з горіхами, мед', weight: '400 г', price: '500 грн' },
       { name: 'Оселедець з картоплею', desc: '', weight: '300 г', price: '280 грн' }
   ]},
-  { section: 'food', id: 'beer_snacks', name: 'Закуски до пива', defaultImage: images.snacks, items: [
-      { name: 'Бастурма', desc: '', weight: '100 г', price: '140 грн' },
-      { name: 'Прошутто', desc: '', weight: '100 г', price: '140 грн' },
-      { name: 'Фокачо', desc: '', weight: '300 г', price: '70 грн' },
-      { name: 'Вушка', desc: '', weight: '100 г', price: '90 грн' },
-      { name: 'Цибулеві кільця', desc: '', weight: '100 г', price: '70 грн' },
-      { name: 'Кільця кальмарів', desc: '', weight: '100 г', price: '130 грн' },
-      { name: 'Соус тартар', desc: '', weight: '50 г', price: '30 грн' }
-  ]},
   { section: 'food', id: 'soups', name: 'Перші страви', defaultImage: images.soups, items: [
       { name: 'Бульйон курячий', desc: 'з локшиною', weight: '300 г', price: '70 грн' },
       { name: 'Солянка', desc: '', weight: '300 г', price: '80 грн' }
@@ -185,6 +176,15 @@ const menuCategories = [
       { name: 'Вілла Крим', desc: '', weight: '0.75 л', price: '200 грн' },
       { name: 'Kartuli Vazi', desc: '', weight: '0.75 л', price: '350 грн' }
   ]},
+  { section: 'bar', id: 'beer_snacks', name: 'Закуски до пива', defaultImage: images.snacks, items: [
+      { name: 'Бастурма', desc: '', weight: '100 г', price: '140 грн' },
+      { name: 'Прошутто', desc: '', weight: '100 г', price: '140 грн' },
+      { name: 'Фокачо', desc: '', weight: '300 г', price: '70 грн' },
+      { name: 'Вушка', desc: '', weight: '100 г', price: '90 грн' },
+      { name: 'Цибулеві кільця', desc: '', weight: '100 г', price: '70 грн' },
+      { name: 'Кільця кальмарів', desc: '', weight: '100 г', price: '130 грн' },
+      { name: 'Соус тартар', desc: '', weight: '50 г', price: '30 грн' }
+  ]},
   { section: 'bar', id: 'draft_beer', name: 'Пиво на розлив', defaultImage: images.beer, items: [
       { name: 'Пшеничне нефільтроване', desc: '', weight: '0.33/0.5л', price: '60 / 75 грн' },
       { name: '«Свіжий Розлив» ППБ', desc: '', weight: '0.33/0.5л', price: '50 / 65 грн' }
@@ -205,9 +205,10 @@ const formatPrice = (priceStr) => {
 export default function App() {
   const [view, setView] = useState('home'); 
   const [menuSection, setMenuSection] = useState('food'); 
-  const currentSectionCategories = menuCategories.filter(c => c.section === menuSection);
   
+  const currentSectionCategories = menuCategories.filter(c => c.section === menuSection);
   const initialCategory = currentSectionCategories[0]?.id || 'pizza';
+  
   const [activeCategory, setActiveCategory] = useState(initialCategory);
   const [searchQuery, setSearchQuery] = useState('');
   
@@ -215,12 +216,14 @@ export default function App() {
   const [selectedItem, setSelectedItem] = useState(null); 
 
   const [bookmarks, setBookmarks] = useState([]);
+  
+  // Ref для блокування автоматичного ScrollSpy при ручному кліку
   const isManualScrollingRef = useRef(false);
 
   // Завантаження закладок
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('romantic_desktop_premium_fixed_v2');
+      const saved = localStorage.getItem('romantic_light_fixed');
       if (saved) setBookmarks(JSON.parse(saved));
     } catch (e) {}
   }, []);
@@ -236,11 +239,11 @@ export default function App() {
     }
     setBookmarks(updated);
     try {
-      localStorage.setItem('romantic_desktop_premium_fixed_v2', JSON.stringify(updated));
+      localStorage.setItem('romantic_light_fixed', JSON.stringify(updated));
     } catch (e) {}
   };
 
-  // Робота з меню та перемиканням розділів
+  // Робота з перемиканням розділів меню (З головної)
   const handleOpenMenu = (section) => {
     isManualScrollingRef.current = true;
     setMenuSection(section);
@@ -248,13 +251,14 @@ export default function App() {
     if (firstCat) setActiveCategory(firstCat.id);
     setSearchQuery('');
     setView('menu');
-    window.scrollTo({top: 0, behavior: 'instant'});
     
     setTimeout(() => {
+      window.scrollTo({top: 0, behavior: 'instant'});
       isManualScrollingRef.current = false;
-    }, 200);
+    }, 10);
   };
 
+  // Перемикання Кухня/Бар всередині меню
   const handleSectionSwitch = (section) => {
     isManualScrollingRef.current = true;
     setMenuSection(section);
@@ -262,33 +266,36 @@ export default function App() {
     if (firstCat) setActiveCategory(firstCat.id);
     setSearchQuery('');
     setShowSectionModal(false);
-    window.scrollTo({top: 0, behavior: 'instant'});
-
-    // Центрування таб-скролу для мобільних
+    
     setTimeout(() => {
+      window.scrollTo({top: 0, behavior: 'instant'});
       const container = document.getElementById('tabs-container');
       if (container) container.scrollTo({ left: 0, behavior: 'instant' });
       isManualScrollingRef.current = false;
-    }, 200);
+    }, 10);
   };
 
-  // SCROLL-SPY: Підсвічування категорії під час гортання
+  // --- БЕЗПЕЧНИЙ SCROLL-SPY (Підсвічування категорії під час гортання) ---
   useEffect(() => {
-    if (view !== 'menu' || searchQuery || isManualScrollingRef.current) return;
+    // ВАЖЛИВО: Ми не блокуємо створення EventListener'а рефом.
+    if (view !== 'menu' || searchQuery) return;
 
     const handleScroll = () => {
+      // Блокуємо виконання логіки скролу лише під час ручного кліку по вкладці
       if (isManualScrollingRef.current) return;
 
       const headerOffset = window.innerWidth >= 1024 ? 120 : 180;
       const scrollY = window.scrollY;
       let newActive = activeCategory;
 
-      for (let i = currentSectionCategories.length - 1; i >= 0; i--) {
-        const cat = currentSectionCategories[i];
+      // Беремо актуальні категорії для поточного розділу
+      const categories = menuCategories.filter(c => c.section === menuSection);
+
+      for (let i = categories.length - 1; i >= 0; i--) {
+        const cat = categories[i];
         const el = document.getElementById(`cat-${cat.id}`);
         if (el) {
           const rect = el.getBoundingClientRect();
-          // Якщо верхня межа елемента перетнула лінію шапки
           if (rect.top <= headerOffset + 40) {
             newActive = cat.id;
             break;
@@ -296,28 +303,32 @@ export default function App() {
         }
       }
 
-      // Перевірка на досягнення самого низу сторінки (щоб остання категорія теж підсвічувалася)
+      // Перевірка на досягнення низу сторінки
       const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 60;
-      if (isAtBottom && currentSectionCategories.length > 0) {
-        newActive = currentSectionCategories[currentSectionCategories.length - 1].id;
+      if (isAtBottom && categories.length > 0) {
+        newActive = categories[categories.length - 1].id;
       }
 
       if (newActive !== activeCategory && newActive !== 'favorites') {
         setActiveCategory(newActive);
-        const tab = document.getElementById(`tab-${newActive}`);
-        const container = document.getElementById('tabs-container');
-        if (tab && container) {
-          const scrollLeft = tab.offsetLeft - container.offsetWidth / 2 + tab.offsetWidth / 2;
-          container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+        
+        // Авто-скрол вкладок для мобільних
+        if (window.innerWidth < 1024) {
+          const tab = document.getElementById(`tab-${newActive}`);
+          const container = document.getElementById('tabs-container');
+          if (tab && container) {
+            const scrollLeft = tab.offsetLeft - container.offsetWidth / 2 + tab.offsetWidth / 2;
+            container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+          }
         }
       }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [view, searchQuery, currentSectionCategories, activeCategory, menuSection]);
+  }, [view, searchQuery, activeCategory, menuSection]);
 
-  // Ручний скрол до категорії
+  // --- РУЧНИЙ СКРОЛ ДО КАТЕГОРІЇ ---
   const scrollToCategory = (id) => {
     isManualScrollingRef.current = true;
     setActiveCategory(id);
@@ -329,26 +340,28 @@ export default function App() {
       const el = document.getElementById(`cat-${id}`);
       if (el) {
         const offset = window.innerWidth >= 1024 ? 100 : 160; 
-        const top = el.offsetTop - offset;
+        const top = el.getBoundingClientRect().top + window.scrollY - offset;
         window.scrollTo({ top, behavior: 'smooth' });
       }
     }
-
-    // Підскролюємо вкладку по центру на мобільних пристроях
-    const tab = document.getElementById(`tab-${id}`);
-    const container = document.getElementById('tabs-container');
-    if (tab && container) {
-      const scrollLeft = tab.offsetLeft - container.offsetWidth / 2 + tab.offsetWidth / 2;
-      container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+    
+    // Підскролюємо вкладку по центру для мобілок
+    if (window.innerWidth < 1024) {
+      const tab = document.getElementById(`tab-${id}`);
+      const container = document.getElementById('tabs-container');
+      if (tab && container) {
+        const scrollLeft = tab.offsetLeft - container.offsetWidth / 2 + tab.offsetWidth / 2;
+        container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+      }
     }
 
-    // Блокуємо ScrollSpy, щоб уникнути стрибків екрана під час анімації скролу
+    // Розблокувати ScrollSpy після завершення анімації
     setTimeout(() => {
       isManualScrollingRef.current = false;
-    }, 950);
+    }, 800);
   };
 
-  // Блокування фонового скролу при відкритому Bottom Sheet
+  // Блокування фонового скролу при відкритих модальних вікнах
   useEffect(() => {
     if (selectedItem || showSectionModal) {
       document.body.style.overflow = 'hidden';
@@ -398,13 +411,17 @@ export default function App() {
 
           <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
             <button onClick={() => handleOpenMenu('food')} className="bg-white rounded-[2rem] p-8 flex flex-col items-center justify-center gap-4 shadow-lg border border-[#E8DCC4]/40 hover:border-[#967259]/40 hover:-translate-y-1 transition-all group">
-              <div className="w-16 h-16 rounded-full bg-[#FCFAF8] text-[#967259] flex items-center justify-center group-hover:scale-110 transition-transform shadow-inner text-3xl">🍕</div>
-              <span className="text-sm font-bold tracking-wider uppercase text-[#2C2621]">Кухня</span>
+              <div className="w-16 h-16 rounded-full bg-[#FCFAF8] text-[#967259] flex items-center justify-center group-hover:scale-110 transition-transform shadow-inner text-3xl">
+                <Utensils className="w-8 h-8" />
+              </div>
+              <span className="text-lg font-bold tracking-widest uppercase text-[#2C2621]">Меню Кухні</span>
             </button>
 
             <button onClick={() => handleOpenMenu('bar')} className="bg-white rounded-[2rem] p-8 flex flex-col items-center justify-center gap-4 shadow-lg border border-[#E8DCC4]/40 hover:border-[#967259]/40 hover:-translate-y-1 transition-all group">
-              <div className="w-16 h-16 rounded-full bg-[#FCFAF8] text-[#967259] flex items-center justify-center group-hover:scale-110 transition-transform shadow-inner text-3xl">🍸</div>
-              <span className="text-sm font-bold tracking-wider uppercase text-[#2C2621]">Бар</span>
+              <div className="w-16 h-16 rounded-full bg-[#FCFAF8] text-[#967259] flex items-center justify-center group-hover:scale-110 transition-transform shadow-inner text-3xl">
+                <Wine className="w-8 h-8" />
+              </div>
+              <span className="text-lg font-bold tracking-widest uppercase text-[#2C2621]">Барне Меню</span>
             </button>
           </div>
 
@@ -434,8 +451,8 @@ export default function App() {
                   </div>
                   <div>
                     <p className="text-[#A99F93] text-xs uppercase tracking-widest font-bold mb-1">Instagram</p>
-                    <a href="https://www.instagram.com/romantic_restaurant_strointsi" target="_blank" rel="noopener noreferrer" className="text-[#2C2621] text-lg font-bold hover:text-[#967259] transition-colors block truncate">
-                      @romantic_restaurant
+                    <a href="https://www.instagram.com/romantic_restaurant_strointsi" target="_blank" rel="noopener noreferrer" className="text-[#2C2621] text-lg font-bold hover:text-[#967259] transition-colors line-clamp-1">
+                      @romantic_restaurant_strointsi
                     </a>
                   </div>
                 </div>
