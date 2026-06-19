@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   Search, Bookmark, X, MapPin, 
   Phone, ChevronDown, ArrowLeft,
-  Utensils, Wine, Camera, Trash2, Heart, Instagram
+  Utensils, Wine, Camera, Trash2, Heart, 
 } from 'lucide-react';
 
 // --- ДАНІ МЕНЮ (СУВОРО ЗА PDF ТА ФОТО КОКТЕЙЛІВ) ---
@@ -565,7 +565,7 @@ export default function App() {
               </div>
               <div className="flex gap-4 items-start">
                 <div className="w-10 h-10 rounded-full bg-[#FDFBF7] flex items-center justify-center flex-shrink-0 border border-[#F0EBE1]">
-                  <Instagram className="text-[#6A1B29] w-4 h-4" />
+                  <Phone className="text-[#6A1B29] w-4 h-4" />
                 </div>
                 <div>
                   <p className="text-[#A99F93] text-[10px] uppercase tracking-widest font-bold mb-1">Instagram</p>
