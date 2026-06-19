@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   Search, Bookmark, X, MapPin, 
   Phone, ChevronRight, ArrowLeft,
-  Utensils, Wine
+  Utensils, Wine, Instagram
 } from 'lucide-react';
 
 // --- ДАНІ МЕНЮ ---
@@ -25,7 +25,7 @@ const images = {
 const menuCategories = [
   // --- КУХНЯ ---
   { section: 'food', id: 'pizza', name: 'Піца', defaultImage: images.pizza, items: [
-      { name: 'ROMANTIC', desc: 'соус, салямі, сир твердий, сир моцарела, ковбаса мисливська, яйце, пармезан', weight: '500г / 800г', price: '190 / 340 грн', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1HLt964JQLk0k-6rKs389WMjtwgYNyWggsg&s' },
+      { name: 'ROMANTIC', desc: 'соус, салямі, сир твердий, сир моцарела, ковбаса мисливська, яйце, пармезан', weight: '500г / 800г', price: '190 / 340 грн', image: '' },
       { name: 'Чотири сири', desc: 'соус, сир фета, сир твердий, сир моцарела, сир пармезан', weight: '500г / 800г', price: '190 / 340 грн', image: '' },
       { name: 'Квадро формаджі', desc: 'соус, дор блю, сир твердий, сир моцарела, сир пармезан', weight: '500г / 800г', price: '220 / 370 грн', image: '' },
       { name: 'Буфало', desc: 'соус, куряче філе, сир моцарела, помідори, сир твердий', weight: '500г / 800г', price: '190 / 340 грн', image: '' },
@@ -59,9 +59,18 @@ const menuCategories = [
       { name: 'Брускети з прошутто', desc: '', weight: '3 шт.', price: '150 грн', image: '' },
       { name: 'Сет брускет', desc: 'з лососем, помідорами, прошутто', weight: '3 шт.', price: '380 грн', image: '' },
       { name: 'Козацька закуска', desc: 'сало, підчеревина, грінки хлібні, бринза, часник', weight: '400 г', price: '350 грн', image: '' },
-      { name: "М'ясна нарізка", desc: 'proшутто, шинка, салямі 3-х видів', weight: '400 г', price: '480 грн', image: '' },
+      { name: "М'ясна нарізка", desc: 'прошутто, шинка, салямі 3-х видів', weight: '400 г', price: '480 грн', image: '' },
       { name: 'Сирна нарізка', desc: 'брі, дор блю, пармезан, сир з горіхами, мед', weight: '400 г', price: '500 грн', image: '' },
       { name: 'Оселедець з картоплею', desc: '', weight: '300 г', price: '280 грн', image: '' }
+  ]},
+  { section: 'food', id: 'beer_snacks', name: 'Закуски до пива', defaultImage: images.snacks, items: [
+      { name: 'Бастурма', desc: '', weight: '100 г', price: '140 грн', image: '' },
+      { name: 'Прошутто', desc: '', weight: '100 г', price: '140 грн', image: '' },
+      { name: 'Фокачо', desc: '', weight: '300 г', price: '70 грн', image: '' },
+      { name: 'Вушка', desc: '', weight: '100 г', price: '90 грн', image: '' },
+      { name: 'Цибулеві кільця', desc: '', weight: '100 г', price: '70 грн', image: '' },
+      { name: 'Кільця кальмарів', desc: '', weight: '100 г', price: '130 грн', image: '' },
+      { name: 'Соус тартар', desc: '', weight: '50 г', price: '30 грн', image: '' }
   ]},
   { section: 'food', id: 'soups', name: 'Перші страви', defaultImage: images.soups, items: [
       { name: 'Бульйон курячий', desc: 'з локшиною', weight: '300 г', price: '70 грн', image: '' },
@@ -176,15 +185,6 @@ const menuCategories = [
       { name: 'Вілла Крим', desc: '', weight: '0.75 л', price: '200 грн', image: '' },
       { name: 'Kartuli Vazi', desc: '', weight: '0.75 л', price: '350 грн', image: '' }
   ]},
-  { section: 'bar', id: 'beer_snacks', name: 'Закуски до пива', defaultImage: images.snacks, items: [
-      { name: 'Бастурма', desc: '', weight: '100 г', price: '140 грн', image: '' },
-      { name: 'Прошутто', desc: '', weight: '100 г', price: '140 грн', image: '' },
-      { name: 'Фокачо', desc: '', weight: '300 г', price: '70 грн', image: '' },
-      { name: 'Вушка', desc: '', weight: '100 г', price: '90 грн', image: '' },
-      { name: 'Цибулеві кільця', desc: '', weight: '100 г', price: '70 грн', image: '' },
-      { name: 'Кільця кальмарів', desc: '', weight: '100 г', price: '130 грн', image: '' },
-      { name: 'Соус тартар', desc: '', weight: '50 г', price: '30 грн', image: '' }
-  ]},
   { section: 'bar', id: 'draft_beer', name: 'Пиво на розлив', defaultImage: images.beer, items: [
       { name: 'Пшеничне нефільтроване', desc: '', weight: '0.33/0.5л', price: '60 / 75 грн', image: '' },
       { name: '«Свіжий Розлив» ППБ', desc: '', weight: '0.33/0.5л', price: '50 / 65 грн', image: '' }
@@ -210,6 +210,7 @@ export default function App() {
   const initialCategory = currentSectionCategories[0]?.id || 'pizza';
   const [activeCategory, setActiveCategory] = useState(initialCategory);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isSearchActive, setIsSearchActive] = useState(false);
   
   const [showSectionModal, setShowSectionModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null); 
@@ -220,7 +221,7 @@ export default function App() {
   // Завантаження закладок
   useEffect(() => {
     try {
-      const saved = localStorage.getItem('romantic_desktop_premium_fixed_v3');
+      const saved = localStorage.getItem('romantic_exp_design_v1');
       if (saved) setBookmarks(JSON.parse(saved));
     } catch (e) {}
   }, []);
@@ -236,23 +237,17 @@ export default function App() {
     }
     setBookmarks(updated);
     try {
-      localStorage.setItem('romantic_desktop_premium_fixed_v3', JSON.stringify(updated));
+      localStorage.setItem('romantic_exp_design_v1', JSON.stringify(updated));
     } catch (e) {}
   };
 
-  // Робота з меню та перемиканням розділів
   const handleOpenMenu = (section) => {
-    isManualScrollingRef.current = true;
     setMenuSection(section);
     const firstCat = menuCategories.find(c => c.section === section);
     if (firstCat) setActiveCategory(firstCat.id);
     setSearchQuery('');
     setView('menu');
-    window.scrollTo({top: 0, behavior: 'instant'});
-    
-    setTimeout(() => {
-      isManualScrollingRef.current = false;
-    }, 200);
+    window.scrollTo(0, 0);
   };
 
   const handleSectionSwitch = (section) => {
@@ -262,43 +257,33 @@ export default function App() {
     if (firstCat) setActiveCategory(firstCat.id);
     setSearchQuery('');
     setShowSectionModal(false);
-    window.scrollTo({top: 0, behavior: 'instant'});
-
-    // Центрування таб-скролу для мобільних
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    
     setTimeout(() => {
       const container = document.getElementById('tabs-container');
       if (container) container.scrollTo({ left: 0, behavior: 'instant' });
       isManualScrollingRef.current = false;
-    }, 200);
+    }, 100);
   };
 
-  // SCROLL-SPY: Підсвічування категорії під час гортання
+  // --- БЕЗПЕЧНИЙ SCROLL-SPY ---
   useEffect(() => {
     if (view !== 'menu' || searchQuery || isManualScrollingRef.current) return;
 
     const handleScroll = () => {
       if (isManualScrollingRef.current) return;
 
-      const headerOffset = window.innerWidth >= 1024 ? 120 : 180;
+      const headerOffset = 150; // Висота фіксованої шапки
       const scrollY = window.scrollY;
       let newActive = activeCategory;
 
       for (let i = currentSectionCategories.length - 1; i >= 0; i--) {
         const cat = currentSectionCategories[i];
         const el = document.getElementById(`cat-${cat.id}`);
-        if (el) {
-          const rect = el.getBoundingClientRect();
-          if (rect.top <= headerOffset + 40) {
-            newActive = cat.id;
-            break;
-          }
+        if (el && scrollY >= el.offsetTop - headerOffset - 20) {
+          newActive = cat.id;
+          break;
         }
-      }
-
-      // Перевірка на досягнення самого низу сторінки
-      const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 60;
-      if (isAtBottom && currentSectionCategories.length > 0) {
-        newActive = currentSectionCategories[currentSectionCategories.length - 1].id;
       }
 
       if (newActive !== activeCategory && newActive !== 'favorites') {
@@ -314,26 +299,25 @@ export default function App() {
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [view, searchQuery, currentSectionCategories, activeCategory, menuSection]);
+  }, [view, searchQuery, activeCategory, currentSectionCategories]);
 
-  // Ручний скрол до категорії
   const scrollToCategory = (id) => {
     isManualScrollingRef.current = true;
     setActiveCategory(id);
     setSearchQuery('');
+    setIsSearchActive(false);
     
     if (id === 'favorites') {
       window.scrollTo({top: 0, behavior: 'smooth'});
     } else {
       const el = document.getElementById(`cat-${id}`);
       if (el) {
-        const offset = window.innerWidth >= 1024 ? 100 : 160; 
+        const offset = 140; 
         const top = el.offsetTop - offset;
         window.scrollTo({ top, behavior: 'smooth' });
       }
     }
-
-    // Підскролюємо вкладку по центру на мобільних пристроях
+    
     const tab = document.getElementById(`tab-${id}`);
     const container = document.getElementById('tabs-container');
     if (tab && container) {
@@ -341,13 +325,11 @@ export default function App() {
       container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
     }
 
-    // Блокуємо ScrollSpy, щоб уникнути стрибків екрана під час анімації скролу
     setTimeout(() => {
       isManualScrollingRef.current = false;
-    }, 950);
+    }, 800);
   };
 
-  // Блокування фонового скролу при відкритому Bottom Sheet
   useEffect(() => {
     if (selectedItem || showSectionModal) {
       document.body.style.overflow = 'hidden';
@@ -356,95 +338,84 @@ export default function App() {
     }
   }, [selectedItem, showSectionModal]);
 
-
   // ==========================================
   // ЕКРАН 1: ГОЛОВНИЙ
   // ==========================================
   if (view === 'home') {
     return (
-      <div className="min-h-screen w-full bg-[#FDFBF7] font-sans relative text-[#2C2621] shadow-2xl overflow-x-hidden selection:bg-[#E8DCC4] selection:text-[#2C2621]">
+      <div className="min-h-screen w-full bg-[#F3F4F6] font-sans relative text-[#111827] mx-auto max-w-md shadow-2xl overflow-x-hidden">
         
-        <style dangerouslySetInnerHTML={{__html: `
-          @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;700&family=Montserrat:wght@300;400;500;600;700&display=swap');
-          .font-handwriting { font-family: 'Dancing Script', cursive; }
-          .font-sans { font-family: 'Montserrat', sans-serif; }
-        `}} />
-
-        <div className="h-[50vh] lg:h-[60vh] w-full bg-cover bg-center relative" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=1920&q=80)' }}>
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-[#FDFBF7]"></div>
-          <div className="absolute inset-0 flex flex-col justify-center items-center z-10 p-6">
-            <h1 className="text-6xl lg:text-8xl font-handwriting font-bold tracking-wide text-white drop-shadow-lg mb-2">Romantic</h1>
-            <div className="flex items-center justify-center gap-4 opacity-90">
-              <span className="w-12 h-[1px] bg-white/60"></span>
-              <p className="text-xs lg:text-sm tracking-[0.3em] uppercase text-white font-medium">Ресторан • Бар</p>
-              <span className="w-12 h-[1px] bg-white/60"></span>
+        <div className="h-[280px] w-full bg-cover bg-center relative" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=1000&q=80)' }}>
+          <div className="absolute inset-0 bg-black/50"></div>
+          <div className="absolute top-0 w-full p-6 flex justify-center items-start z-10">
+            <div className="text-center mx-auto mt-4 w-full text-white">
+              <p className="text-[10px] tracking-widest uppercase opacity-70 mb-1">Ресторан • Бар</p>
+              <h1 className="text-4xl font-light tracking-wider">ROMANTIC</h1>
             </div>
           </div>
         </div>
 
-        <div className="relative -mt-16 lg:-mt-24 px-4 pb-20 z-20 max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="relative -mt-12 px-4 pb-12 z-20">
           
-          <div className="bg-white/95 backdrop-blur-xl rounded-[2rem] p-8 shadow-xl border border-[#E8DCC4]/40 flex flex-col justify-center items-center text-center lg:col-span-1">
-            <div className="w-24 h-24 rounded-full border-[4px] border-white bg-[#FCFAF8] text-[#967259] flex items-center justify-center shadow-md mb-4">
-              <span className="font-handwriting text-5xl font-bold leading-none pt-2">R</span>
+          <div className="bg-white rounded-[1.2rem] p-6 shadow-sm mb-4 relative pt-12">
+            <div className="absolute -top-10 left-5 w-20 h-20 rounded-full border-[4px] border-[#F3F4F6] bg-[#8B4513] text-white flex items-center justify-center font-serif text-[11px] leading-tight text-center">
+              ROM<br/>ANTIC
             </div>
-            <h2 className="text-3xl font-bold text-[#2C2621] mb-2">Romantic</h2>
-            <p className="text-[#8A7969] font-medium flex items-center gap-1.5 mt-2">
-              <MapPin className="w-4 h-4 text-[#967259]" />
-              с. Строїнці
+            <h2 className="text-2xl font-bold text-[#111827]">Romantic</h2>
+            <p className="text-[#6B7280] text-sm mt-1 font-medium flex items-center gap-1.5">
+              <MapPin className="w-4 h-4 text-[#6B7280]" /> с. Строїнці
             </p>
           </div>
 
-          <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <button onClick={() => handleOpenMenu('food')} className="bg-white rounded-[2rem] p-8 flex flex-col items-center justify-center gap-4 shadow-lg border border-[#E8DCC4]/40 hover:border-[#967259]/40 hover:-translate-y-1 transition-all group">
-              <div className="w-16 h-16 rounded-full bg-[#FCFAF8] text-[#967259] flex items-center justify-center group-hover:scale-110 transition-transform shadow-inner">
-                <Utensils className="w-8 h-8" />
-              </div>
-              <span className="text-sm font-bold tracking-wider uppercase text-[#2C2621]">Кухня</span>
-            </button>
+          <button onClick={() => handleOpenMenu('food')} className="w-full bg-white rounded-[1.2rem] p-5 mb-3 flex items-center justify-between shadow-sm active:bg-gray-50 transition-colors">
+            <div className="flex items-center gap-3">
+               <div className="w-10 h-10 rounded-full bg-[#F3F4F6] flex items-center justify-center text-[#4B5563]">
+                  <Utensils className="w-5 h-5" />
+               </div>
+               <span className="text-[17px] font-bold text-[#111827]">Кухня</span>
+            </div>
+            <ChevronRight className="text-[#9CA3AF] w-5 h-5" />
+          </button>
 
-            <button onClick={() => handleOpenMenu('bar')} className="bg-white rounded-[2rem] p-8 flex flex-col items-center justify-center gap-4 shadow-lg border border-[#E8DCC4]/40 hover:border-[#967259]/40 hover:-translate-y-1 transition-all group">
-              <div className="w-16 h-16 rounded-full bg-[#FCFAF8] text-[#967259] flex items-center justify-center group-hover:scale-110 transition-transform shadow-inner">
-                <Wine className="w-8 h-8" />
-              </div>
-              <span className="text-sm font-bold tracking-wider uppercase text-[#2C2621]">Бар</span>
-            </button>
-          </div>
+          <button onClick={() => handleOpenMenu('bar')} className="w-full bg-white rounded-[1.2rem] p-5 mb-6 flex items-center justify-between shadow-sm active:bg-gray-50 transition-colors">
+            <div className="flex items-center gap-3">
+               <div className="w-10 h-10 rounded-full bg-[#F3F4F6] flex items-center justify-center text-[#4B5563]">
+                  <Wine className="w-5 h-5" />
+               </div>
+               <span className="text-[17px] font-bold text-[#111827]">Бар</span>
+            </div>
+            <ChevronRight className="text-[#9CA3AF] w-5 h-5" />
+          </button>
 
-          <div className="bg-white rounded-[2rem] p-8 shadow-xl border border-[#E8DCC4]/40 lg:col-span-3 mt-4">
-            <div className="lg:flex lg:justify-between lg:items-center">
-              <div className="lg:w-1/2">
-                <h3 className="text-3xl font-handwriting font-bold text-[#967259] mb-4">Ваше свято</h3>
-                <p className="text-[#5C5146] text-base mb-6 font-medium leading-relaxed max-w-md">
-                  Ми з радістю організуємо та проведемо для Вас найкращі події: <br/>
-                  <span className="font-semibold text-[#2C2621]">Дні народження, Весілля, Сімейні свята.</span>
-                </p>
-              </div>
+          <div className="px-2 pt-2">
+            <h3 className="text-xl font-bold text-[#111827] mb-3">Про заклад</h3>
+            <ul className="text-[#6B7280] text-[15px] space-y-1.5 mb-6 font-medium">
+              <li className="flex items-center gap-2.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#9CA3AF]"></span> Дні народження
+              </li>
+              <li className="flex items-center gap-2.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#9CA3AF]"></span> Весілля
+              </li>
+              <li className="flex items-center gap-2.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#9CA3AF]"></span> Сімейні свята
+              </li>
+            </ul>
 
-              <div className="space-y-6 pt-6 lg:pt-0 lg:w-1/2 border-t lg:border-t-0 lg:border-l border-[#F3EFEA] lg:pl-12">
-                <div className="flex gap-5 items-center">
-                  <div className="w-12 h-12 rounded-full bg-[#FCFAF8] flex items-center justify-center border border-[#F3EFEA]">
-                    <Phone className="text-[#967259] w-5 h-5" />
-                  </div>
-                  <div>
-                    <p className="text-[#A99F93] text-xs uppercase tracking-widest font-bold mb-1">Телефон</p>
-                    <a href="tel:+380997272881" className="text-[#2C2621] text-lg font-bold hover:text-[#967259] transition-colors">+380 99 727 28 81</a>
-                  </div>
+            <div className="space-y-6">
+              <div className="flex gap-4 items-start">
+                <Phone className="text-[#111827] w-6 h-6 mt-0.5" strokeWidth={1.5} />
+                <div className="pt-0.5">
+                  <p className="text-[#9CA3AF] text-[11px] uppercase tracking-wide font-semibold mb-0.5">Телефон</p>
+                  <a href="tel:+380997272881" className="text-[#111827] font-medium text-[15px] hover:underline">+380 99 727 28 81</a>
                 </div>
-                <div className="flex gap-5 items-center">
-                  <div className="w-12 h-12 rounded-full bg-[#FCFAF8] flex items-center justify-center border border-[#F3EFEA]">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#967259] w-5 h-5">
-                      <rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect>
-                      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                      <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line>
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-[#A99F93] text-xs uppercase tracking-widest font-bold mb-1">Instagram</p>
-                    <a href="https://www.instagram.com/romantic_restaurant_strointsi" target="_blank" rel="noopener noreferrer" className="text-[#2C2621] text-lg font-bold hover:text-[#967259] transition-colors line-clamp-1">
-                      @romantic_restaurant_strointsi
-                    </a>
-                  </div>
+              </div>
+              <div className="flex gap-4 items-start">
+                <Instagram className="text-[#111827] w-6 h-6 mt-0.5" strokeWidth={1.5} />
+                <div className="pt-0.5 w-[80%]">
+                  <p className="text-[#9CA3AF] text-[11px] uppercase tracking-wide font-semibold mb-0.5">Instagram</p>
+                  <a href="https://www.instagram.com/romantic_restaurant_strointsi" target="_blank" rel="noopener noreferrer" className="text-[#111827] font-medium text-[15px] hover:underline block truncate">
+                    @romantic_restaurant_strointsi
+                  </a>
                 </div>
               </div>
             </div>
@@ -455,319 +426,261 @@ export default function App() {
   }
 
   // ==========================================
-  // ЕКРАН 2: МЕНЮ (НАСТІЛЬНА ТА МОБІЛЬНА ВЕРСІЯ)
+  // ЕКРАН 2: МЕНЮ (EXPIRENZA STYLE)
   // ==========================================
   return (
-    <div className="min-h-screen w-full bg-[#FDFBF7] text-[#2C2621] font-sans flex flex-col lg:flex-row relative selection:bg-[#E8DCC4] selection:text-[#2C2621]">
+    <div className="min-h-screen w-full bg-[#F3F4F6] text-[#111827] font-sans relative mx-auto max-w-md shadow-2xl">
       
       <style dangerouslySetInnerHTML={{__html: `
-        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;700&family=Montserrat:wght@300;400;500;600;700&display=swap');
-        .font-handwriting { font-family: 'Dancing Script', cursive; }
-        .font-sans { font-family: 'Montserrat', sans-serif; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        body { background-color: #F3F4F6; margin: 0; }
         html { scroll-behavior: smooth; }
-        body { background-color: #E8DCC4; }
       `}} />
 
-      {/* --- СТАЦІОНАРНА БІЧНА ПАНЕЛЬ ДЛЯ ПК (Sidebar) --- */}
-      <aside className="hidden lg:flex w-80 h-screen sticky top-0 bg-white border-r border-[#E8DCC4]/50 flex-col shadow-[4px_0_24px_rgba(0,0,0,0.02)] z-30">
-        <div className="p-8 border-b border-[#F3EFEA] flex flex-col items-center">
-          <div className="w-16 h-16 rounded-full border-[3px] border-[#F3EFEA] bg-[#FCFAF8] text-[#967259] flex items-center justify-center mb-3">
-             <span className="font-handwriting text-3xl font-bold leading-none pt-1">R</span>
-          </div>
-          <h2 className="text-2xl font-bold text-[#2C2621]">Romantic</h2>
-          <button onClick={() => setView('home')} className="mt-4 text-[11px] uppercase tracking-widest font-bold text-[#8A7969] hover:text-[#967259] flex items-center gap-1">
-            <ArrowLeft className="w-3 h-3"/> На головну
-          </button>
-        </div>
-
-        <div className="p-6">
-          <div className="flex bg-[#FCFAF8] p-1.5 rounded-full border border-[#E8DCC4]/50 mb-6">
-            <button onClick={() => handleSectionSwitch('food')} className={`flex-1 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${menuSection === 'food' ? 'bg-white shadow-sm text-[#967259]' : 'text-[#8A7969] hover:text-[#2C2621]'}`}>Кухня</button>
-            <button onClick={() => handleSectionSwitch('bar')} className={`flex-1 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${menuSection === 'bar' ? 'bg-white shadow-sm text-[#967259]' : 'text-[#8A7969] hover:text-[#2C2621]'}`}>Бар</button>
-          </div>
-
-          <nav className="flex flex-col gap-1 overflow-y-auto max-h-[calc(100vh-320px)] no-scrollbar pr-2">
-            <button
-              onClick={() => scrollToCategory('favorites')}
-              className={`text-left px-5 py-3 rounded-xl text-sm font-semibold transition-all flex items-center gap-3 ${activeCategory === 'favorites' ? 'bg-[#967259] text-white shadow-md' : 'text-[#5C5146] hover:bg-[#FCFAF8]'}`}
+      {/* HEADER (Sticky) */}
+      <div className="sticky top-0 z-40 bg-[#F3F4F6] pt-4 pb-2 w-full">
+        <div className="px-4">
+          <div className="flex items-center justify-between mb-4">
+            
+            <button 
+              onClick={() => setView('home')} 
+              className="w-10 h-10 rounded-full bg-white border border-gray-200 text-[#4B5563] flex-shrink-0 flex items-center justify-center shadow-sm active:scale-95 transition-transform"
             >
-              <Bookmark className={`w-4 h-4 ${activeCategory === 'favorites' ? 'fill-white' : ''}`} /> 
-              Збережені
-            </button>
-            <div className="h-px bg-[#F3EFEA] my-2 mx-4"></div>
-            {currentSectionCategories.map(cat => (
-              <button
-                key={cat.id}
-                onClick={() => scrollToCategory(cat.id)}
-                className={`text-left px-5 py-3 rounded-xl text-sm font-semibold transition-all ${activeCategory === cat.id ? 'bg-[#FCFAF8] text-[#967259] shadow-sm border border-[#E8DCC4]/50' : 'text-[#5C5146] border border-transparent hover:bg-gray-50'}`}
-              >
-                {cat.name}
-              </button>
-            ))}
-          </nav>
-        </div>
-      </aside>
-
-      {/* --- ОСНОВНИЙ КОНТЕНТ --- */}
-      <div className="flex-1 flex flex-col w-full">
-        
-        {/* МОБІЛЬНА ШАПКА (Тільки для мобільних) */}
-        <header className="lg:hidden sticky top-0 z-40 bg-[#FDFBF7]/95 backdrop-blur-xl pt-4 pb-3 border-b border-[#F3EFEA] shadow-sm px-4">
-          <div className="flex gap-3 mb-4 items-center">
-            <button onClick={() => setView('home')} className="w-11 h-11 rounded-full border border-[#F3EFEA] bg-white text-[#967259] flex-shrink-0 flex items-center justify-center shadow-sm">
               <ArrowLeft className="w-5 h-5" />
             </button>
             
-            <div className="relative flex-grow">
-              <input 
-                type="text" 
-                placeholder="Пошук..." 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-11 bg-white border border-[#E8DCC4]/50 rounded-full text-sm outline-none focus:border-[#967259] pl-11 pr-8 shadow-sm"
-              />
-              <Search className="absolute left-4 top-3.5 w-4 h-4 text-[#967259]/60" />
-              {searchQuery && (
-                <button onClick={() => setSearchQuery('')} className="absolute right-4 top-3.5 text-gray-400"><X className="w-4 h-4" /></button>
+            <div className="flex items-center gap-2 justify-end flex-grow ml-2">
+              {isSearchActive ? (
+                <div className="relative w-full max-w-[200px] animate-in fade-in zoom-in-95 duration-200">
+                  <input 
+                    autoFocus
+                    type="text" 
+                    placeholder="Пошук..." 
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full h-10 bg-white border border-gray-200 rounded-full text-[15px] outline-none pl-10 pr-10 shadow-sm"
+                  />
+                  <Search className="absolute left-3.5 top-3 w-4 h-4 text-[#9CA3AF]" />
+                  <button 
+                    onClick={() => { setIsSearchActive(false); setSearchQuery(''); }} 
+                    className="absolute right-3.5 top-3 text-[#9CA3AF] hover:text-[#111827]"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <button 
+                  onClick={() => setIsSearchActive(true)}
+                  className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-[#4B5563] shadow-sm active:bg-gray-50 transition-colors"
+                >
+                  <Search className="w-4 h-4" />
+                </button>
               )}
             </div>
           </div>
 
-          <div className="flex bg-[#FCFAF8] p-1 rounded-full border border-[#E8DCC4]/50 mb-3">
-            <button onClick={() => handleSectionSwitch('food')} className={`flex-1 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${menuSection === 'food' ? 'bg-white shadow-sm text-[#967259]' : 'text-[#8A7969]'}`}>Кухня</button>
-            <button onClick={() => handleSectionSwitch('bar')} className={`flex-1 py-2 rounded-full text-xs font-bold uppercase tracking-widest transition-all ${menuSection === 'bar' ? 'bg-white shadow-sm text-[#967259]' : 'text-[#8A7969]'}`}>Бар</button>
+          <div className="flex bg-[#E5E7EB] p-1 rounded-full w-full mb-3">
+            <button onClick={() => handleSectionSwitch('food')} className={`flex-1 py-2 rounded-full text-[15px] font-bold transition-all ${menuSection === 'food' ? 'bg-white shadow-sm text-[#111827]' : 'text-[#6B7280]'}`}>Кухня</button>
+            <button onClick={() => handleSectionSwitch('bar')} className={`flex-1 py-2 rounded-full text-[15px] font-bold transition-all ${menuSection === 'bar' ? 'bg-white shadow-sm text-[#111827]' : 'text-[#6B7280]'}`}>Бар</button>
           </div>
+        </div>
 
-          {/* Горизонтальні вкладки на мобілці */}
-          {!searchQuery && (
-            <div id="tabs-container" className="flex overflow-x-auto gap-2 no-scrollbar pb-1 pt-1">
-              <button
-                id="tab-favorites"
-                onClick={() => scrollToCategory('favorites')}
-                className={`px-4 py-2 rounded-full text-[13px] font-bold transition-all whitespace-nowrap flex items-center gap-2 border shadow-sm ${activeCategory === 'favorites' ? 'bg-[#967259] text-white border-[#967259]' : 'bg-white text-[#5C5146] border-[#E8DCC4]/50'}`}
-              >
-                <Bookmark className={`w-4 h-4 ${activeCategory === 'favorites' ? 'fill-white' : ''}`} strokeWidth={2.5}/>
-              </button>
-              {currentSectionCategories.map((cat) => (
+        {/* Горизонтальний скрол категорій */}
+        {!searchQuery && (
+          <div id="tabs-container" className="flex overflow-x-auto gap-2 px-4 no-scrollbar pb-2 pt-1">
+            <button
+              id="tab-favorites"
+              onClick={() => scrollToCategory('favorites')}
+              className={`px-4 py-2 rounded-full text-[14px] font-semibold transition-colors flex items-center justify-center flex-shrink-0 border ${
+                activeCategory === 'favorites' 
+                  ? 'bg-[#5B3BA8] text-white border-[#5B3BA8]' 
+                  : 'bg-white text-[#4B5563] border-gray-200 hover:bg-gray-50'
+              }`}
+            >
+              <Bookmark className={`w-4 h-4 ${activeCategory === 'favorites' ? 'fill-white' : ''}`} strokeWidth={activeCategory === 'favorites' ? 1.5 : 2}/>
+            </button>
+            
+            {currentSectionCategories.map((cat) => {
+              const isActive = activeCategory === cat.id;
+              return (
                 <button
                   key={cat.id}
                   id={`tab-${cat.id}`}
                   onClick={() => scrollToCategory(cat.id)}
-                  className={`px-6 py-2 rounded-full text-[13px] font-bold transition-all whitespace-nowrap border shadow-sm ${activeCategory === cat.id ? 'bg-[#967259] text-white border-[#967259]' : 'bg-white text-[#5C5146] border-[#E8DCC4]/50'}`}
+                  className={`px-5 py-2.5 rounded-full text-[14px] font-semibold transition-colors flex-shrink-0 border shadow-sm ${
+                    isActive 
+                      ? 'bg-[#5B3BA8] text-white border-[#5B3BA8]' 
+                      : 'bg-white text-[#4B5563] border-gray-200 hover:bg-gray-50'
+                  }`}
                 >
                   {cat.name}
                 </button>
-              ))}
-            </div>
-          )}
-        </header>
-
-        {/* ШАПКА ДЛЯ ПК (Пошук) */}
-        <header className="hidden lg:flex sticky top-0 z-20 bg-[#FDFBF7]/90 backdrop-blur-md px-8 py-5 border-b border-[#F3EFEA] justify-end">
-          <div className="relative w-80">
-            <input 
-              type="text" 
-              placeholder="Пошук страв..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full h-11 bg-white border border-[#E8DCC4]/50 rounded-full text-sm outline-none focus:border-[#967259] pl-11 pr-8 shadow-sm transition-all"
-            />
-            <Search className="absolute left-4 top-3.5 w-4 h-4 text-[#967259]/60" />
-            {searchQuery && (
-              <button onClick={() => setSearchQuery('')} className="absolute right-4 top-3.5 text-gray-400 hover:text-[#2C2621]"><X className="w-4 h-4" /></button>
-            )}
+              );
+            })}
           </div>
-        </header>
-
-        {/* ОСНОВНА ОБЛАСТЬ ЗІ СПИСКОМ */}
-        <main className="px-4 lg:px-8 pt-6 lg:pt-10 pb-24 max-w-5xl mx-auto w-full">
-          
-          {/* Банер (Жива музика) */}
-          {activeCategory !== 'favorites' && !searchQuery && (
-            <div className="w-full h-48 lg:h-64 bg-[#FCFAF8] rounded-[2rem] mb-12 overflow-hidden relative shadow-[0_8px_30px_rgba(0,0,0,0.06)] border border-[#E8DCC4]/40 group">
-              <img 
-                src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=1200&q=80" 
-                alt="Live Music Banner" 
-                className="w-full h-full object-cover opacity-20 sepia group-hover:scale-105 transition-transform duration-1000"
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-[#FDFBF7]/50 to-transparent"></div>
-              <div className="absolute inset-0 flex flex-col items-center lg:items-start justify-center text-center lg:text-left p-8 lg:p-16">
-                <h3 className="text-4xl lg:text-6xl font-handwriting font-bold text-[#967259] mb-2 drop-shadow-sm">Жива музика</h3>
-                <div className="flex gap-3 text-xs lg:text-sm font-bold text-[#5C5146] uppercase tracking-wider pt-2">
-                  <span className="bg-white/60 px-3 py-1 rounded backdrop-blur-sm">Субота - Неділя</span>
-                  <span className="bg-white/60 px-3 py-1 rounded backdrop-blur-sm">з 18:00</span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* КОНТЕНТ */}
-          {searchQuery ? (
-            <div>
-              <h2 className="text-3xl font-handwriting font-bold text-[#967259] mb-8">Результати пошуку</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-                {currentSectionCategories.flatMap(cat => cat.items.map(item => ({...item, categoryId: cat.id, originalCategory: cat.name, defaultImage: cat.defaultImage})))
-                  .filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()) || (item.desc && item.desc.toLowerCase().includes(searchQuery.toLowerCase())))
-                  .map((item, idx) => {
-                    const uniqueId = `${item.categoryId}__${item.name}`;
-                    const isBookmarked = bookmarks.includes(uniqueId);
-                    return (
-                      <div key={idx} className="bg-white rounded-[1.5rem] flex flex-col overflow-hidden shadow-sm border border-[#E8DCC4]/50 hover:shadow-xl hover:-translate-y-1 transition-all group cursor-pointer" onClick={() => setSelectedItem(item)}>
-                        <div className="h-48 w-full relative bg-[#FCFAF8] overflow-hidden">
-                          <img src={item.image || item.defaultImage} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"/>
-                          <button 
-                            onClick={(e) => { e.stopPropagation(); toggleBookmark(item.categoryId, item.name); }}
-                            className="absolute top-3 right-3 w-10 h-10 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center z-10 shadow-sm hover:bg-white"
-                          >
-                            <Bookmark className={`w-5 h-5 ${isBookmarked ? 'fill-[#967259] text-[#967259]' : 'text-[#8A7969]'}`} strokeWidth={isBookmarked ? 1 : 2} />
-                          </button>
-                        </div>
-                        <div className="p-5 flex-1 flex flex-col">
-                          <h3 className="text-[17px] font-bold text-[#2C2621] leading-tight mb-2">{item.name}</h3>
-                          {item.desc && <p className="text-[13px] text-[#8A7969] leading-relaxed line-clamp-2 font-medium mb-4">{item.desc}</p>}
-                          <div className="mt-auto pt-4 border-t border-[#F3EFEA] flex items-center justify-between">
-                            <span className="text-[12px] text-[#A99F93] font-semibold bg-[#FCFAF8] px-2 py-1 rounded border border-[#E8DCC4]/30">{item.weight || (menuSection === 'bar' ? 'порція' : '100 г')}</span>
-                            <span className="text-[18px] font-bold text-[#967259]">{formatPrice(item.price)}</span>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-              </div>
-            </div>
-          ) : activeCategory === 'favorites' ? (
-            <div>
-              <h2 className="text-4xl font-handwriting font-bold text-[#967259] mb-8">Збережені страви</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-                {currentSectionCategories.flatMap(cat => cat.items.map(item => ({...item, categoryId: cat.id, originalCategory: cat.name, defaultImage: cat.defaultImage})))
-                  .filter(item => bookmarks.includes(`${item.categoryId}__${item.name}`))
-                  .map((item, idx) => (
-                    <div key={idx} className="bg-white rounded-[1.5rem] flex flex-col overflow-hidden shadow-md border border-[#967259]/30 cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all group" onClick={() => setSelectedItem(item)}>
-                      <div className="h-48 w-full relative bg-[#FCFAF8] overflow-hidden">
-                        <img src={item.image || item.defaultImage} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"/>
-                        <button 
-                          onClick={(e) => { e.stopPropagation(); toggleBookmark(item.categoryId, item.name); }}
-                          className="absolute top-3 right-3 w-10 h-10 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center z-10 shadow-sm"
-                        >
-                          <Bookmark className="w-5 h-5 fill-[#967259] text-[#967259]" strokeWidth={1} />
-                        </button>
-                        <div className="absolute bottom-3 left-3 bg-black/60 backdrop-blur-sm text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full font-sans">
-                          {item.originalCategory}
-                        </div>
-                      </div>
-                      <div className="p-5 flex-1 flex flex-col">
-                        <h3 className="text-[17px] font-bold text-[#2C2621] leading-tight mb-2">{item.name}</h3>
-                        {item.desc && <p className="text-[13px] text-[#8A7969] leading-relaxed line-clamp-2 font-medium mb-4">{item.desc}</p>}
-                        <div className="mt-auto pt-4 border-t border-[#F3EFEA] flex items-center justify-between">
-                          <span className="text-[12px] text-[#A99F93] font-semibold">{item.weight || (menuSection === 'bar' ? 'порція' : '100 г')}</span>
-                          <span className="text-[18px] font-bold text-[#967259]">{formatPrice(item.price)}</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-              </div>
-              {bookmarks.length === 0 && (
-                <div className="text-center py-32 bg-white rounded-[2rem] border border-[#E8DCC4]/50 shadow-sm mt-4">
-                  <Bookmark className="w-12 h-12 text-[#E8DCC4] mx-auto mb-4" strokeWidth={1.5} />
-                  <p className="text-[#8A7969] font-medium text-lg">Тут поки нічого немає.</p>
-                </div>
-              )}
-            </div>
-          ) : (
-            currentSectionCategories.map((category) => (
-              <div key={category.id} id={`cat-${category.id}`} className="mb-14 lg:pt-8 scroll-mt-[180px] lg:scroll-mt-[100px]">
-                <div className="flex items-center gap-6 mb-8">
-                  <h2 className="text-4xl lg:text-5xl font-handwriting font-bold text-[#967259]">{category.name}</h2>
-                  <div className="h-[1px] flex-grow bg-gradient-to-r from-[#967259]/30 to-transparent mt-2"></div>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-                  {category.items.map((item, idx) => {
-                    const uniqueId = `${category.id}__${item.name}`;
-                    const isBookmarked = bookmarks.includes(uniqueId);
-
-                    return (
-                      <div 
-                        key={idx} 
-                        className={`bg-white rounded-[1.5rem] flex flex-col overflow-hidden shadow-sm border cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all group ${isBookmarked ? 'border-[#967259]/40' : 'border-[#E8DCC4]/50'}`}
-                        onClick={() => setSelectedItem({ ...item, categoryId: category.id, defaultImage: category.defaultImage })}
-                      >
-                        <div className="h-48 lg:h-56 w-full relative bg-[#FCFAF8] overflow-hidden">
-                          <img src={item.image || category.defaultImage} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"/>
-                          <button 
-                            onClick={(e) => { e.stopPropagation(); toggleBookmark(category.id, item.name); }}
-                            className="absolute top-3 right-3 w-10 h-10 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center z-10 shadow-sm hover:bg-white"
-                          >
-                            <Bookmark className={`w-5 h-5 ${isBookmarked ? 'fill-[#967259] text-[#967259]' : 'text-[#8A7969]'}`} strokeWidth={isBookmarked ? 1 : 2} />
-                          </button>
-                        </div>
-                        <div className="p-5 flex-1 flex flex-col">
-                          <h3 className="text-[17px] font-bold text-[#2C2621] leading-tight mb-2">{item.name}</h3>
-                          {item.desc && <p className="text-[13px] text-[#8A7969] leading-relaxed line-clamp-2 font-medium mb-4">{item.desc}</p>}
-                          
-                          <div className="mt-auto pt-4 border-t border-[#F3EFEA] flex items-center justify-between">
-                            <span className="text-[12px] text-[#A99F93] font-semibold bg-[#FCFAF8] px-2 py-1 rounded border border-[#E8DCC4]/30">{item.weight || (menuSection === 'bar' ? 'порція' : '100 г')}</span>
-                            <span className="text-[18px] font-bold text-[#967259]">{formatPrice(item.price)}</span>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            ))
-          )}
-        </main>
+        )}
       </div>
 
-      {/* МОДАЛЬНЕ ВІКНО: Картка Товару (Центрована для ПК, Bottom Sheet для мобільних) */}
+      {/* ОСНОВНА ЧАСТИНА (Список страв) */}
+      <div className="px-4 pt-4 pb-24 max-w-md mx-auto">
+        
+        {/* СПИСОК */}
+        {searchQuery ? (
+          <div>
+            <h2 className="text-[22px] font-bold text-[#111827] mb-6 mt-2">Результати пошуку</h2>
+            <div className="flex flex-col">
+              {currentSectionCategories.flatMap(cat => cat.items.map(item => ({...item, categoryId: cat.id, originalCategory: cat.name, defaultImage: cat.defaultImage})))
+                .filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()) || (item.desc && item.desc.toLowerCase().includes(searchQuery.toLowerCase())))
+                .map((item, idx) => {
+                  const uniqueId = `${item.categoryId}__${item.name}`;
+                  const isBookmarked = bookmarks.includes(uniqueId);
+                  return (
+                    <div key={idx} className="bg-white rounded-2xl p-3.5 mb-3 flex gap-4 cursor-pointer shadow-sm border border-gray-100 active:bg-gray-50 transition-colors" onClick={() => setSelectedItem(item)}>
+                      <div className="flex-1 flex flex-col pt-1">
+                        <h3 className="text-[16px] font-bold text-[#111827] leading-snug mb-1">{item.name}</h3>
+                        <div className="text-[16px] font-bold text-[#111827] mb-1.5">{formatPrice(item.price)}</div>
+                        {item.desc && <p className="text-[13px] text-[#6B7280] leading-snug line-clamp-2 mb-2">{item.desc}</p>}
+                        <div className="mt-auto">
+                          <span className="text-[12px] text-[#9CA3AF] font-medium">{item.weight || (menuSection === 'bar' ? 'порція' : '100 г')}</span>
+                        </div>
+                      </div>
+                      <div className="w-[100px] flex-shrink-0 relative h-[100px]">
+                        <img src={item.image || item.defaultImage} alt={item.name} className="w-full h-full rounded-xl object-cover bg-gray-100"/>
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); toggleBookmark(item.categoryId, item.name); }}
+                          className="absolute -bottom-2 -right-2 w-8 h-8 bg-white border border-gray-100 shadow-sm rounded-full flex items-center justify-center z-10 active:scale-90"
+                        >
+                          <Bookmark className={`w-3.5 h-3.5 ${isBookmarked ? 'fill-[#5B3BA8] text-[#5B3BA8]' : 'text-[#6B7280]'}`} strokeWidth={isBookmarked ? 1.5 : 2} />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+            </div>
+          </div>
+        ) : activeCategory === 'favorites' ? (
+          <div>
+            <h2 className="text-[22px] font-bold text-[#111827] mb-6 mt-2">Збережені</h2>
+            <div className="flex flex-col">
+              {currentSectionCategories.flatMap(cat => cat.items.map(item => ({...item, categoryId: cat.id, originalCategory: cat.name, defaultImage: cat.defaultImage})))
+                .filter(item => bookmarks.includes(`${item.categoryId}__${item.name}`))
+                .map((item, idx) => (
+                  <div key={idx} className="bg-white rounded-2xl p-3.5 mb-3 flex gap-4 cursor-pointer shadow-sm border border-gray-100 active:bg-gray-50 transition-colors" onClick={() => setSelectedItem(item)}>
+                    <div className="flex-1 flex flex-col pt-1">
+                      <h3 className="text-[16px] font-bold text-[#111827] leading-snug mb-1">{item.name}</h3>
+                      <div className="text-[16px] font-bold text-[#111827] mb-1.5">{formatPrice(item.price)}</div>
+                      {item.desc && <p className="text-[13px] text-[#6B7280] leading-snug line-clamp-2 mb-2">{item.desc}</p>}
+                      <div className="mt-auto">
+                        <span className="text-[12px] text-[#9CA3AF] font-medium">{item.weight || (menuSection === 'bar' ? 'порція' : '100 г')}</span>
+                      </div>
+                    </div>
+                    <div className="w-[100px] flex-shrink-0 relative h-[100px]">
+                      <img src={item.image || item.defaultImage} alt={item.name} className="w-full h-full rounded-xl object-cover bg-gray-100"/>
+                      <button 
+                        onClick={(e) => { e.stopPropagation(); toggleBookmark(item.categoryId, item.name); }}
+                        className="absolute -bottom-2 -right-2 w-8 h-8 bg-white border border-gray-100 shadow-sm rounded-full flex items-center justify-center z-10 active:scale-90"
+                      >
+                        <Bookmark className="w-3.5 h-3.5 fill-[#5B3BA8] text-[#5B3BA8]" strokeWidth={1.5} />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+            </div>
+            {bookmarks.length === 0 && (
+              <div className="text-center py-20 bg-white rounded-2xl border border-gray-100 shadow-sm mt-2">
+                <Bookmark className="w-8 h-8 text-gray-300 mx-auto mb-3" strokeWidth={1.5} />
+                <p className="text-[#6B7280] text-sm">Тут поки нічого немає.</p>
+              </div>
+            )}
+          </div>
+        ) : (
+          currentSectionCategories.map((category) => (
+            <div key={category.id} id={`cat-${category.id}`} className="mb-8 pt-2 scroll-mt-[150px]">
+              <h2 className="text-[22px] font-bold text-[#111827] mb-5">{category.name}</h2>
+              
+              <div className="flex flex-col">
+                {category.items.map((item, idx) => {
+                  const uniqueId = `${category.id}__${item.name}`;
+                  const isBookmarked = bookmarks.includes(uniqueId);
+
+                  return (
+                    <div 
+                      key={idx} 
+                      className="bg-white rounded-2xl p-3.5 mb-3 flex gap-4 cursor-pointer shadow-sm border border-gray-100 active:bg-gray-50 transition-colors"
+                      onClick={() => setSelectedItem({ ...item, categoryId: category.id, defaultImage: category.defaultImage })}
+                    >
+                      <div className="flex-1 flex flex-col pt-1">
+                        <h3 className="text-[16px] font-bold text-[#111827] leading-snug mb-1">{item.name}</h3>
+                        <div className="text-[16px] font-bold text-[#111827] mb-1.5">{formatPrice(item.price)}</div>
+                        {item.desc && <p className="text-[13px] text-[#6B7280] leading-snug line-clamp-2 mb-2">{item.desc}</p>}
+                        <div className="mt-auto">
+                          <span className="text-[12px] text-[#9CA3AF] font-medium">{item.weight || (menuSection === 'bar' ? 'порція' : '100 г')}</span>
+                        </div>
+                      </div>
+
+                      <div className="w-[100px] flex-shrink-0 relative h-[100px]">
+                        <img src={item.image || category.defaultImage} alt={item.name} className="w-full h-full rounded-xl object-cover bg-gray-100"/>
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); toggleBookmark(category.id, item.name); }}
+                          className="absolute -bottom-2 -right-2 w-8 h-8 bg-white border border-gray-100 shadow-sm rounded-full flex items-center justify-center z-10 active:scale-90"
+                        >
+                          <Bookmark className={`w-3.5 h-3.5 ${isBookmarked ? 'fill-[#5B3BA8] text-[#5B3BA8]' : 'text-[#6B7280]'}`} strokeWidth={isBookmarked ? 1.5 : 2} />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* МОДАЛЬНЕ ВІКНО: Картка Товару (Bottom Sheet) */}
       {selectedItem && (
-        <div className="fixed inset-0 z-50 bg-[#2C2621]/60 backdrop-blur-sm flex items-end lg:items-center justify-center animate-in fade-in duration-300" onClick={() => setSelectedItem(null)}>
-          <div className="bg-white w-full max-w-md lg:max-w-4xl rounded-t-[2.5rem] lg:rounded-[2rem] animate-in slide-in-from-bottom-full lg:zoom-in-95 overflow-hidden flex flex-col lg:flex-row max-h-[85vh] lg:max-h-[70vh] shadow-2xl" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 flex items-end justify-center animate-in fade-in duration-200">
+          <div className="absolute inset-0 bg-black/40" onClick={() => setSelectedItem(null)}></div>
+          <div className="bg-white w-full max-w-md rounded-t-[1.5rem] animate-in slide-in-from-bottom-full overflow-hidden flex flex-col max-h-[85vh] z-10 relative">
             
-            <div className="relative w-full lg:w-1/2 h-72 lg:h-auto bg-[#FCFAF8]">
+            <div className="relative w-full h-64 bg-gray-100">
               <img src={selectedItem.image || selectedItem.defaultImage} alt={selectedItem.name} className="w-full h-full object-cover" />
               <button 
                 onClick={() => setSelectedItem(null)} 
-                className="absolute top-5 right-5 lg:left-5 lg:right-auto w-10 h-10 bg-white/90 backdrop-blur-md border border-[#E8DCC4]/50 rounded-full flex items-center justify-center text-[#2C2621] shadow-sm hover:bg-white animate-in duration-200"
+                className="absolute top-4 right-4 w-9 h-9 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center text-[#111827] shadow-sm"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="flex flex-col lg:w-1/2 h-full">
-              <div className="px-7 pt-8 pb-6 flex-1 overflow-y-auto no-scrollbar">
-                <h2 className="text-2xl font-bold text-[#2C2621] leading-tight mb-4">{selectedItem.name}</h2>
-                <div className="text-3xl font-bold text-[#967259] mb-6">{formatPrice(selectedItem.price)}</div>
-                
-                {selectedItem.weight && <span className="inline-block bg-[#FCFAF8] border border-[#F3EFEA] text-[#8A7969] px-4 py-2 rounded-xl text-xs font-bold mb-6 tracking-wide">{selectedItem.weight}</span>}
-                
-                {selectedItem.desc && (
-                  <div>
-                    <h4 className="text-[10px] uppercase tracking-widest font-bold text-[#A99F93] mb-2 font-sans">Опис</h4>
-                    <p className="text-[#5C5146] font-medium leading-relaxed text-[15px]">{selectedItem.desc}</p>
-                  </div>
-                )}
-              </div>
+            <div className="px-6 py-6 flex-1 overflow-y-auto no-scrollbar">
+              <h2 className="text-[22px] font-bold text-[#111827] leading-tight mb-2">{selectedItem.name}</h2>
+              <div className="text-[22px] font-bold text-[#111827] mb-6">{formatPrice(selectedItem.price)}</div>
+              
+              {selectedItem.desc && (
+                <p className="text-[#4B5563] text-[15px] leading-relaxed mb-6">{selectedItem.desc}</p>
+              )}
 
-              <div className="p-6 border-t border-[#F3EFEA] bg-[#FCFAF8]">
-                <button 
-                  onClick={() => {
-                    toggleBookmark(selectedItem.categoryId, selectedItem.name);
-                    setSelectedItem(null);
-                  }}
-                  className={`w-full py-4 rounded-[1.2rem] flex items-center justify-center gap-3 font-bold text-[15px] tracking-wide uppercase transition-all shadow-sm hover:shadow-md ${
-                    bookmarks.includes(`${selectedItem.categoryId}__${selectedItem.name}`)
-                      ? 'bg-white text-[#8A7969] border border-[#E8DCC4]'
-                      : 'bg-[#967259] text-white border border-[#967259]'
-                  }`}
-                >
-                  <Bookmark className={`w-5 h-5 ${bookmarks.includes(`${selectedItem.categoryId}__${selectedItem.name}`) ? 'fill-current' : 'fill-white'}`} strokeWidth={2}/>
-                  {bookmarks.includes(`${selectedItem.categoryId}__${selectedItem.name}`) ? 'Видалити із закладок' : 'Додати в закладки'}
-                </button>
-              </div>
+              {selectedItem.weight && (
+                <div className="text-[#9CA3AF] text-[14px] font-medium">{selectedItem.weight}</div>
+              )}
+            </div>
+
+            <div className="p-4 bg-white border-t border-gray-100">
+              <button 
+                onClick={() => {
+                  toggleBookmark(selectedItem.categoryId, selectedItem.name);
+                  setSelectedItem(null);
+                }}
+                className={`w-full py-3.5 rounded-xl flex items-center justify-center gap-2 font-bold text-[16px] transition-colors ${
+                  bookmarks.includes(`${selectedItem.categoryId}__${selectedItem.name}`)
+                    ? 'bg-gray-100 text-[#111827]'
+                    : 'bg-[#5B3BA8] text-white'
+                }`}
+              >
+                <Bookmark className={`w-5 h-5 ${bookmarks.includes(`${selectedItem.categoryId}__${selectedItem.name}`) ? 'fill-[#111827]' : ''}`} />
+                {bookmarks.includes(`${selectedItem.categoryId}__${selectedItem.name}`) ? 'Видалити із закладок' : 'Додати в закладки'}
+              </button>
             </div>
           </div>
         </div>
