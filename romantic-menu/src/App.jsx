@@ -25,7 +25,7 @@ const images = {
 const menuCategories = [
   // --- КУХНЯ ---
   { section: 'food', id: 'pizza', name: 'Піца', defaultImage: images.pizza, items: [
-      { name: 'ROMANTIC', desc: 'соус, салямі, сир твердий, сир моцарела, ковбаса мисливська, яйце, пармезан', weight: '500г / 800г', price: '190 / 340 грн', image: '' },
+      { name: 'ROMANTIC', desc: 'соус, салямі, сир твердий, сир моцарела, ковбаса мисливська, яйце, пармезан', weight: '500г / 800г', price: '190 / 340 грн', image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ1HLt964JQLk0k-6rKs389WMjtwgYNyWggsg&s' },
       { name: 'Чотири сири', desc: 'соус, сир фета, сир твердий, сир моцарела, сир пармезан', weight: '500г / 800г', price: '190 / 340 грн', image: '' },
       { name: 'Квадро формаджі', desc: 'соус, дор блю, сир твердий, сир моцарела, сир пармезан', weight: '500г / 800г', price: '220 / 370 грн', image: '' },
       { name: 'Буфало', desc: 'соус, куряче філе, сир моцарела, помідори, сир твердий', weight: '500г / 800г', price: '190 / 340 грн', image: '' },
