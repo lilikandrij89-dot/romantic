@@ -1,16 +1,32 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Search, Bookmark, X, MapPin, 
-  Phone, ChevronRight, ArrowLeft,
-  Utensils, Wine, Camera, Trash2
+  Phone, ChevronDown, ArrowLeft,
+  Utensils, Wine, Camera, Trash2, Heart, Instagram
 } from 'lucide-react';
 
 // --- ДАНІ МЕНЮ (СУВОРО ЗА PDF ТА ФОТО КОКТЕЙЛІВ) ---
 const defaultPlaceholder = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=400&q=80";
 
+const images = {
+  pizza: "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=600&q=80",
+  salads: "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&fit=crop&w=600&q=80",
+  snacks: "https://images.unsplash.com/photo-1541529086526-db283c563270?auto=format&fit=crop&w=600&q=80",
+  soups: "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=600&q=80",
+  fish: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?auto=format&fit=crop&w=600&q=80",
+  sides: "https://images.unsplash.com/photo-1576107248882-ff2648419619?auto=format&fit=crop&w=600&q=80",
+  meat: "https://images.unsplash.com/photo-1544025162-8311db9f0eb2?auto=format&fit=crop&w=600&q=80",
+  sushi: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?auto=format&fit=crop&w=600&q=80",
+  coffee: "https://images.unsplash.com/photo-1497935586351-b67a49e012bf?auto=format&fit=crop&w=600&q=80",
+  alcohol: "https://images.unsplash.com/photo-1560512823-829485b8bf24?auto=format&fit=crop&w=600&q=80",
+  desserts: "https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?auto=format&fit=crop&w=600&q=80",
+  beer: "https://images.unsplash.com/photo-1538481199005-271011d7e056?auto=format&fit=crop&w=600&q=80",
+  drinks: "https://images.unsplash.com/photo-1544145945-f90425340c7e?auto=format&fit=crop&w=600&q=80"
+};
+
 const menuCategories = [
   // --- КУХНЯ ---
-  { section: 'food', id: 'pizza', name: 'Піца', items: [
+  { section: 'food', id: 'pizza', name: 'Піца', defaultImage: images.pizza, items: [
       { name: 'ROMANTIC', desc: 'соус, салямі, сир твердий, сир моцарела, ковбаса мисливська, яйце, пармезан', weight: '500г / 800г', price: '190 / 340 грн', image: '' },
       { name: 'Чотири сири', desc: 'соус, сир фета, сир твердий, сир моцарела, сир пармезан', weight: '500г / 800г', price: '190 / 340 грн', image: '' },
       { name: 'Квадро формаджі', desc: 'соус, дор блю, сир твердий, сир моцарела, сир пармезан', weight: '500г / 800г', price: '220 / 370 грн', image: '' },
@@ -30,7 +46,7 @@ const menuCategories = [
       { name: 'Піца з Морепродуктами', desc: 'соус, морепродукти, сир твердий, сир моцарела, сир пармезан', weight: '500г / 800г', price: '290 / 420 грн', image: '' },
       { name: 'Корнетта', desc: 'соус, шинка, курка, кукурудза, сир твердий, сир моцарела, помідори, сир пармезан', weight: '500г / 800г', price: '190 / 340 грн', image: '' }
   ]},
-  { section: 'food', id: 'salads', name: 'Салати', items: [
+  { section: 'food', id: 'salads', name: 'Салати', defaultImage: images.salads, items: [
       { name: 'Цезар', desc: 'мікс салату, помідори, яйце, філе куряче, сир пармезан, соус цезар, грінки', weight: '250 г', price: '190 грн', image: '' },
       { name: 'Салат ROMANTIC', desc: 'авокадо, мікс салату, соус, креветки, помідори, кунжут', weight: '200 г', price: '200 грн', image: '' },
       { name: 'Грецький', desc: 'мікс салату, помідори, огірки, перець болгарський, маслини, сир Фета, оливкова олія', weight: '200 г', price: '160 грн', image: '' },
@@ -39,7 +55,7 @@ const menuCategories = [
       { name: 'Салат з тунцем', desc: 'мікс салату, огірки, помідори, тунець, олія оливкова', weight: '200 г', price: '200 грн', image: '' },
       { name: 'Салат с лососем', desc: 'лосось, філаделфія, мікс салата, помідори, авокадо', weight: '250 г', price: '230 грн', image: '' }
   ]},
-  { section: 'food', id: 'cold_snacks', name: 'Холодні закуски', items: [
+  { section: 'food', id: 'cold_snacks', name: 'Холодні закуски', defaultImage: images.snacks, items: [
       { name: 'Брускети з помідорами', desc: '', weight: '3 шт.', price: '80 грн', image: '' },
       { name: 'Брускети з лососем', desc: '', weight: '3 шт.', price: '160 грн', image: '' },
       { name: 'Брускети з прошутто', desc: '', weight: '3 шт.', price: '150 грн', image: '' },
@@ -49,11 +65,11 @@ const menuCategories = [
       { name: 'Сирна нарізка', desc: 'брі, дор блю, пармезан, сир з горіхами, мед', weight: '400 г', price: '500 грн', image: '' },
       { name: 'Оселедець з картоплею', desc: '', weight: '300 г', price: '280 грн', image: '' }
   ]},
-  { section: 'food', id: 'soups', name: 'Перші страви', items: [
+  { section: 'food', id: 'soups', name: 'Перші страви', defaultImage: images.soups, items: [
       { name: 'Бульйон курячий', desc: 'з локшиною', weight: '300 г', price: '70 грн', image: '' },
       { name: 'Солянка', desc: '', weight: '300 г', price: '80 грн', image: '' }
   ]},
-  { section: 'food', id: 'fish', name: 'Рибні страви', items: [
+  { section: 'food', id: 'fish', name: 'Рибні страви', defaultImage: images.fish, items: [
       { name: 'Короп смажений у кукурудзяній муці', desc: '', weight: '100 г', price: '58 грн', image: '' },
       { name: 'Короп на мангалі', desc: '', weight: '100 г', price: '58 грн', image: '' },
       { name: 'Скумбрія на мангалі', desc: '', weight: '100 г', price: '62 грн', image: '' },
@@ -62,7 +78,7 @@ const menuCategories = [
       { name: 'Креветка в клярі', desc: '', weight: '6 шт.', price: '350 грн', image: '' },
       { name: 'Соломаха', desc: '', weight: '50 г', price: '30 грн', image: '' }
   ]},
-  { section: 'food', id: 'sides', name: 'Гарніри', items: [
+  { section: 'food', id: 'sides', name: 'Гарніри', defaultImage: images.sides, items: [
       { name: 'Картопля фрі', desc: '', weight: '150/50 г', price: '90 грн', image: '' },
       { name: 'Картопля пюре', desc: '', weight: '200 г', price: '70 грн', image: '' },
       { name: 'Картопля по домашньому', desc: 'з беконом та бринзою', weight: '200 г', price: '90 грн', image: '' },
@@ -74,13 +90,13 @@ const menuCategories = [
       { name: 'Бринза', desc: '', weight: '50 г', price: '30 грн', image: '' },
       { name: 'Овочі гриль', desc: 'кабачки, баклажани, гриби, перець болгарський', weight: '400 г', price: '200 грн', image: '' }
   ]},
-  { section: 'food', id: 'meat', name: "М'ясні страви", items: [
+  { section: 'food', id: 'meat', name: "М'ясні страви", defaultImage: images.meat, items: [
       { name: 'Курячий шашлик', desc: '', weight: '100 г', price: '65 грн', image: '' },
       { name: 'Шашлик свинний', desc: '', weight: '100 г', price: '80 грн', image: '' },
       { name: 'Курячі крильця', desc: '', weight: '100 г', price: '50 грн', image: '' },
       { name: 'Соус', desc: '', weight: '50 г', price: '30 грн', image: '' }
   ]},
-  { section: 'food', id: 'sushi', name: 'Роли', items: [
+  { section: 'food', id: 'sushi', name: 'Роли', defaultImage: images.sushi, items: [
       { name: 'Рол Преміум ROMANTIC', desc: 'Рол із лососем, крем-сиром та авокадо, доповнений хрусткою креветкою панко, ікрою тобіко та червоною ікрою.', weight: '320 г', price: '550 грн', image: '' },
       { name: 'Філадельфія', desc: 'лосось, авокадо, сир Філадельфія, огірок', weight: '', price: '250 грн', image: '' },
       { name: 'Каліфорнія', desc: 'лосось, авокадо, огірок, кунжут', weight: '', price: '185 грн', image: '' },
@@ -97,7 +113,7 @@ const menuCategories = [
       { name: 'Сет Філадельфії', desc: 'Філадельфія, нагасакі, макі з лосося, Боніто з креветкою', weight: '', price: '800 грн', image: '' },
       { name: 'Сет Макі', desc: 'Макі з лососем, макі з авокадо, макі з огірком, макі з вугрем', weight: '', price: '470 грн', image: '' }
   ]},
-  { section: 'food', id: 'desserts', name: 'Десерти', items: [
+  { section: 'food', id: 'desserts', name: 'Десерти', defaultImage: images.desserts, items: [
       { name: 'Шоколадний фондан з морозивом', desc: '', weight: '100г / 90г', price: '150 грн', image: '' },
       { name: 'Морозиво з джемом', desc: '', weight: '150 г', price: '90 грн', image: '' },
       { name: 'Морозиво з фруктами', desc: '', weight: '200 г', price: '100 грн', image: '' },
@@ -108,7 +124,7 @@ const menuCategories = [
   ]},
 
   // --- БАР ---
-  { section: 'bar', id: 'alc_cocktails', name: 'Алкогольні коктейлі', items: [
+  { section: 'bar', id: 'alc_cocktails', name: 'Алкогольні коктейлі', defaultImage: images.alcohol, items: [
       { name: 'Амазонка', desc: 'фруктова база "Манго-маракуя", сироп "Ваніль", ром Bacardi, содова', weight: '300 мл', price: '180 грн', image: '' },
       { name: 'Полуничний бум', desc: 'фруктова база "Полуниця", сироп "м\'ята", ром Bacardi, содова', weight: '300 мл', price: '180 грн', image: '' },
       { name: 'Піна Колада', desc: 'ром Bacardi, сироп "Кокосовий", сік Ананасовий', weight: '300 мл', price: '180 грн', image: '' },
@@ -117,7 +133,7 @@ const menuCategories = [
       { name: 'Мохіто', desc: 'м\'ята, лимон, лайм, ром Bacardi, Sprite', weight: '300 мл', price: '170 грн', image: '' },
       { name: 'Сангрія', desc: 'червоне вино, ром Bacardi, Sprite', weight: '300 мл', price: '200 грн', image: '' }
   ]},
-  { section: 'bar', id: 'non_alc_cocktails', name: 'Безалкогольні коктейлі', items: [
+  { section: 'bar', id: 'non_alc_cocktails', name: 'Безалкогольні коктейлі', defaultImage: images.drinks, items: [
       { name: 'Лимонад «Манго-маракуя»', desc: '', weight: '300 мл', price: '90 грн', image: '' },
       { name: 'Лимонад «Ківі»', desc: '', weight: '300 мл', price: '90 грн', image: '' },
       { name: 'Лимонад «Полуниця»', desc: '', weight: '300 мл', price: '90 грн', image: '' },
@@ -125,7 +141,7 @@ const menuCategories = [
       { name: 'Лимонад «Цитрус»', desc: '', weight: '300 мл', price: '90 грн', image: '' },
       { name: 'Мохіто безалкогольне', desc: 'м\'ята, лимон, лайм, Sprite', weight: '300 мл', price: '90 грн', image: '' }
   ]},
-  { section: 'bar', id: 'coffee_tea', name: 'Кава та чай', items: [
+  { section: 'bar', id: 'coffee_tea', name: 'Кава та чай', defaultImage: images.coffee, items: [
       { name: 'Еспресо', desc: '', weight: '0.03 л', price: '35 грн', image: '' },
       { name: 'Американо', desc: '', weight: '0.12 л', price: '50 грн', image: '' },
       { name: 'Американо з молоком', desc: '', weight: '0.16 л', price: '60 грн', image: '' },
@@ -135,34 +151,34 @@ const menuCategories = [
       { name: 'Чай живий', desc: 'в асортименті', weight: '0.7 л', price: '90 грн', image: '' },
       { name: 'Какао з маршмелоу', desc: '', weight: '', price: '90 грн', image: '' }
   ]},
-  { section: 'bar', id: 'vodka', name: 'Горілка', items: [
+  { section: 'bar', id: 'vodka', name: 'Горілка', defaultImage: images.alcohol, items: [
       { name: 'Finlandia', desc: '', weight: '50г / 0.5л', price: '65 / 500 грн', image: '' },
       { name: 'Козацька Рада', desc: '', weight: '50г / 0.5л', price: '30 / 220 грн', image: '' },
       { name: 'Гетьман', desc: '', weight: '50г / 0.5л', price: '35 / 240 грн', image: '' },
       { name: 'Absolut', desc: '', weight: '50г / 0.5л', price: '70 / 520 грн', image: '' },
       { name: 'Львівська Преміум', desc: '', weight: '50г / 0.7л', price: '45 / 450 грн', image: '' }
   ]},
-  { section: 'bar', id: 'cognac', name: 'Коньяк', items: [
+  { section: 'bar', id: 'cognac', name: 'Коньяк', defaultImage: images.alcohol, items: [
       { name: 'ΜΕТАХА 5*', desc: '', weight: '50г / 0.5л', price: '70 / 570 грн', image: '' },
       { name: 'Старий Кахеті 5*', desc: '', weight: '50г / 0.5л', price: '50 / 450 грн', image: '' },
       { name: 'Азнаурі 5*', desc: '', weight: '50г / 0.5л', price: '50 / 450 грн', image: '' },
       { name: 'Александріон 5*', desc: '', weight: '50г / 0.5л', price: '50 / 450 грн', image: '' }
   ]},
-  { section: 'bar', id: 'whiskey', name: 'Віскі', items: [
+  { section: 'bar', id: 'whiskey', name: 'Віскі', defaultImage: images.alcohol, items: [
       { name: "William lawson's", desc: '', weight: '50г / 0.5л', price: '80 / 700 грн', image: '' },
       { name: 'Jack Daniels', desc: '', weight: '50г / 0.5л', price: '110 / 1000 грн', image: '' },
       { name: 'Ballantines', desc: '', weight: '50г / 0.5л', price: '100 / 900 грн', image: '' }
   ]},
-  { section: 'bar', id: 'champagne', name: 'Шампанське', items: [
+  { section: 'bar', id: 'champagne', name: 'Шампанське', defaultImage: images.alcohol, items: [
       { name: 'Fragollino', desc: '', weight: '0.75 л', price: '350 грн', image: '' },
       { name: 'Martini Asti', desc: '', weight: '0.75 л', price: '600 грн', image: '' },
       { name: 'Prosseco', desc: '', weight: '0.75 л', price: '600 грн', image: '' }
   ]},
-  { section: 'bar', id: 'wine', name: 'Вино', items: [
+  { section: 'bar', id: 'wine', name: 'Вино', defaultImage: images.alcohol, items: [
       { name: 'Вілла Крим', desc: '', weight: '0.75 л', price: '200 грн', image: '' },
       { name: 'Kartuli Vazi', desc: '', weight: '0.75 л', price: '350 грн', image: '' }
   ]},
-  { section: 'bar', id: 'beer_snacks', name: 'Закуски до пива', items: [
+  { section: 'bar', id: 'beer_snacks', name: 'Закуски до пива', defaultImage: images.snacks, items: [
       { name: 'Бастурма', desc: '', weight: '100 г', price: '140 грн', image: '' },
       { name: 'Прошутто', desc: '', weight: '100 г', price: '140 грн', image: '' },
       { name: 'Фокачо', desc: '', weight: '300 г', price: '70 грн', image: '' },
@@ -171,11 +187,11 @@ const menuCategories = [
       { name: 'Кільця кальмарів', desc: '', weight: '100 г', price: '130 грн', image: '' },
       { name: 'Соус тартар', desc: '', weight: '50 г', price: '30 грн', image: '' }
   ]},
-  { section: 'bar', id: 'draft_beer', name: 'Пиво на розлив', items: [
+  { section: 'bar', id: 'draft_beer', name: 'Пиво на розлив', defaultImage: images.beer, items: [
       { name: 'Пшеничне нефільтроване', desc: '', weight: '0.33/0.5л', price: '60 / 75 грн', image: '' },
       { name: '«Свіжий Розлив» ППБ', desc: '', weight: '0.33/0.5л', price: '50 / 65 грн', image: '' }
   ]},
-  { section: 'bar', id: 'non_alcoholic', name: 'Безалкогольні напої', items: [
+  { section: 'bar', id: 'non_alcoholic', name: 'Безалкогольні напої', defaultImage: images.drinks, items: [
       { name: 'Coca-cola', desc: '', weight: '', price: '50 грн', image: '' },
       { name: 'Fanta', desc: '', weight: '', price: '50 грн', image: '' },
       { name: 'Вода мінеральна Bonaqua', desc: '', weight: '', price: '40 грн', image: '' },
@@ -196,9 +212,7 @@ export default function App() {
   const initialCategory = currentSectionCategories[0]?.id || 'pizza';
   const [activeCategory, setActiveCategory] = useState(initialCategory);
   const [searchQuery, setSearchQuery] = useState('');
-  const [isSearchActive, setIsSearchActive] = useState(false);
   
-  const [showSectionModal, setShowSectionModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null); 
 
   const [bookmarks, setBookmarks] = useState([]);
@@ -208,10 +222,10 @@ export default function App() {
   // --- LOCAL STORAGE (Збереження закладок та кастомних фото) ---
   useEffect(() => {
     try {
-      const savedBookmarks = localStorage.getItem('romantic_light_fixed_v2');
+      const savedBookmarks = localStorage.getItem('romantic_expirenza_bookmarks');
       if (savedBookmarks) setBookmarks(JSON.parse(savedBookmarks));
 
-      const savedImages = localStorage.getItem('romantic_custom_images');
+      const savedImages = localStorage.getItem('romantic_expirenza_custom_images');
       if (savedImages) setCustomImages(JSON.parse(savedImages));
     } catch (e) {
       console.error(e);
@@ -228,7 +242,7 @@ export default function App() {
     }
     setBookmarks(updated);
     try {
-      localStorage.setItem('romantic_light_fixed_v2', JSON.stringify(updated));
+      localStorage.setItem('romantic_expirenza_bookmarks', JSON.stringify(updated));
     } catch (e) {}
   };
 
@@ -264,16 +278,14 @@ export default function App() {
         const ctx = canvas.getContext('2d');
         ctx.drawImage(img, 0, 0, width, height);
 
-        // Стискаємо зображення до JPEG з якістю 60% щоб не переповнити localStorage
         const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.6);
-
         const newImages = { ...customImages, [uniqueId]: compressedDataUrl };
         setCustomImages(newImages);
 
         try {
-          localStorage.setItem('romantic_custom_images', JSON.stringify(newImages));
+          localStorage.setItem('romantic_expirenza_custom_images', JSON.stringify(newImages));
         } catch (err) {
-          alert("Пам'ять переповнена. Неможливо зберегти більше фотографій, спробуйте завантажити менше зображення.");
+          alert("Пам'ять переповнена. Неможливо зберегти більше фотографій.");
         }
       };
       img.src = event.target.result;
@@ -286,11 +298,11 @@ export default function App() {
     delete newImages[uniqueId];
     setCustomImages(newImages);
     try {
-      localStorage.setItem('romantic_custom_images', JSON.stringify(newImages));
+      localStorage.setItem('romantic_expirenza_custom_images', JSON.stringify(newImages));
     } catch (e) {}
   };
 
-  // Робота з перемиканням розділів меню (З головної)
+  // --- РОБОТА З МЕНЮ ---
   const handleOpenMenu = (section) => {
     isManualScrollingRef.current = true;
     setMenuSection(section);
@@ -298,70 +310,66 @@ export default function App() {
     if (firstCat) setActiveCategory(firstCat.id);
     setSearchQuery('');
     setView('menu');
+    window.scrollTo({top: 0, behavior: 'instant'});
     
     setTimeout(() => {
-      window.scrollTo({top: 0, behavior: 'instant'});
       isManualScrollingRef.current = false;
-    }, 10);
+    }, 100);
   };
 
-  // Перемикання Кухня/Бар всередині меню
   const handleSectionSwitch = (section) => {
     isManualScrollingRef.current = true;
     setMenuSection(section);
     const firstCat = menuCategories.find(c => c.section === section);
     if (firstCat) setActiveCategory(firstCat.id);
     setSearchQuery('');
-    setShowSectionModal(false);
-    
+    window.scrollTo({top: 0, behavior: 'instant'});
+
     setTimeout(() => {
-      window.scrollTo({top: 0, behavior: 'instant'});
       const container = document.getElementById('tabs-container');
       if (container) container.scrollTo({ left: 0, behavior: 'instant' });
       isManualScrollingRef.current = false;
-    }, 10);
+    }, 100);
   };
 
   // --- БЕЗПЕЧНИЙ SCROLL-SPY ---
   useEffect(() => {
-    if (view !== 'menu' || searchQuery) return;
+    if (view !== 'menu' || searchQuery || isManualScrollingRef.current) return;
 
     const handleScroll = () => {
       if (isManualScrollingRef.current) return;
 
-      const headerOffset = window.innerWidth >= 1024 ? 120 : 180;
+      const headerOffset = 180; // Висота липкої шапки
       const scrollY = window.scrollY;
       let newActive = activeCategory;
+      const visibleCategories = menuCategories.filter(c => c.section === menuSection);
 
-      const categories = menuCategories.filter(c => c.section === menuSection);
-
-      for (let i = categories.length - 1; i >= 0; i--) {
-        const cat = categories[i];
+      for (let i = visibleCategories.length - 1; i >= 0; i--) {
+        const cat = visibleCategories[i];
         const el = document.getElementById(`cat-${cat.id}`);
         if (el) {
-          const rect = el.getBoundingClientRect();
-          if (rect.top <= headerOffset + 40) {
+          const elTop = el.getBoundingClientRect().top + scrollY;
+          if (scrollY >= elTop - headerOffset - 20) {
             newActive = cat.id;
             break;
           }
         }
       }
 
-      const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 60;
-      if (isAtBottom && categories.length > 0) {
-        newActive = categories[categories.length - 1].id;
+      // Перевірка на досягнення самого низу сторінки
+      const isAtBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 50;
+      if (isAtBottom && visibleCategories.length > 0) {
+        newActive = visibleCategories[visibleCategories.length - 1].id;
       }
 
       if (newActive !== activeCategory && newActive !== 'favorites') {
         setActiveCategory(newActive);
         
-        if (window.innerWidth < 1024) {
-          const tab = document.getElementById(`tab-${newActive}`);
-          const container = document.getElementById('tabs-container');
-          if (tab && container) {
-            const scrollLeft = tab.offsetLeft - container.offsetWidth / 2 + tab.offsetWidth / 2;
-            container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
-          }
+        const tab = document.getElementById(`tab-${newActive}`);
+        const container = document.getElementById('tabs-container');
+        if (tab && container) {
+          const scrollLeft = tab.offsetLeft - container.offsetWidth / 2 + tab.offsetWidth / 2;
+          container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
         }
       }
     };
@@ -381,19 +389,17 @@ export default function App() {
     } else {
       const el = document.getElementById(`cat-${id}`);
       if (el) {
-        const offset = window.innerWidth >= 1024 ? 100 : 160; 
+        const offset = 160; 
         const top = el.getBoundingClientRect().top + window.scrollY - offset;
         window.scrollTo({ top, behavior: 'smooth' });
       }
     }
     
-    if (window.innerWidth < 1024) {
-      const tab = document.getElementById(`tab-${id}`);
-      const container = document.getElementById('tabs-container');
-      if (tab && container) {
-        const scrollLeft = tab.offsetLeft - container.offsetWidth / 2 + tab.offsetWidth / 2;
-        container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
-      }
+    const tab = document.getElementById(`tab-${id}`);
+    const container = document.getElementById('tabs-container');
+    if (tab && container) {
+      const scrollLeft = tab.offsetLeft - container.offsetWidth / 2 + tab.offsetWidth / 2;
+      container.scrollTo({ left: scrollLeft, behavior: 'smooth' });
     }
 
     setTimeout(() => {
@@ -402,12 +408,12 @@ export default function App() {
   };
 
   useEffect(() => {
-    if (selectedItem || showSectionModal) {
+    if (selectedItem) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'unset';
     }
-  }, [selectedItem, showSectionModal]);
+  }, [selectedItem]);
 
 
   // --- ФУНКЦІЯ ВІДМАЛЬОВКИ КАРТКИ ТОВАРУ ---
@@ -416,39 +422,44 @@ export default function App() {
     const uniqueId = `${catId}__${item.name}`;
     const isBookmarked = bookmarks.includes(uniqueId);
     
-    // Пріоритет: Кастомне фото -> Фото з коду -> Дефолтний плейсхолдер
-    const imgSrc = customImages[uniqueId] || item.image || defaultPlaceholder;
+    const imgSrc = customImages[uniqueId] || item.image || item.defaultImage || defaultPlaceholder;
 
     return (
       <div 
         key={uniqueId} 
-        className="bg-white rounded-[1.2rem] p-4 mb-3 flex gap-4 cursor-pointer shadow-sm active:bg-gray-50 transition-colors" 
+        className="bg-white rounded-[1.5rem] p-3 shadow-[0_2px_10px_rgb(0,0,0,0.02)] border border-[#F0EBE1] flex gap-4 items-center cursor-pointer active:scale-[0.99] transition-transform" 
         onClick={() => setSelectedItem({ ...item, categoryId: catId })}
       >
-        <div className="flex-1 flex flex-col justify-center">
-          <h3 className="text-[16px] font-bold text-[#111827] leading-snug mb-1">{item.name}</h3>
-          <div className="text-[16px] font-bold text-[#111827] mb-1.5">{formatPrice(item.price)}</div>
-          {item.desc && <p className="text-[13px] text-[#6B7280] leading-snug line-clamp-2 mb-2">{item.desc}</p>}
-          <div className="mt-auto">
-            <span className="text-[12px] text-[#9CA3AF] font-medium">{item.weight || (menuSection === 'bar' ? 'порція' : '100 г')}</span>
-          </div>
-        </div>
-
-        <div className="w-[100px] flex-shrink-0 relative h-[100px]">
-          <img src={imgSrc} alt={item.name} className="w-full h-full rounded-[1rem] object-cover bg-gray-100"/>
+        <div className="w-24 h-24 sm:w-28 sm:h-28 flex-shrink-0 rounded-xl overflow-hidden bg-[#F8F6F0] relative">
+          <img src={imgSrc} alt={item.name} className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
           
-          {/* Кнопка зміни фото (Камера) */}
-          <label className="absolute top-1 left-1 w-7 h-7 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center z-10 cursor-pointer shadow-sm hover:bg-gray-100" onClick={e => e.stopPropagation()}>
-            <Camera className="w-3.5 h-3.5 text-gray-700" />
+          <label className="absolute top-1.5 left-1.5 w-7 h-7 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center z-10 cursor-pointer shadow-sm hover:bg-gray-100" onClick={e => e.stopPropagation()}>
+            <Camera className="w-3.5 h-3.5 text-[#6A1B29]" />
             <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, uniqueId)} />
           </label>
 
           <button 
             onClick={(e) => { e.stopPropagation(); toggleBookmark(catId, item.name); }}
-            className="absolute -bottom-2 -right-2 w-8 h-8 bg-white border border-gray-100 shadow-sm rounded-full flex items-center justify-center z-10 active:scale-90"
+            className="absolute bottom-1.5 right-1.5 w-7 h-7 bg-white/90 backdrop-blur-md border border-white/20 shadow-sm rounded-full flex items-center justify-center z-10 active:scale-90 transition-transform"
           >
-            <Bookmark className={`w-3.5 h-3.5 ${isBookmarked ? 'fill-[#111827] text-[#111827]' : 'text-[#6B7280]'}`} strokeWidth={isBookmarked ? 1.5 : 2} />
+            <Bookmark className={`w-3.5 h-3.5 ${isBookmarked ? 'fill-[#6A1B29] text-[#6A1B29]' : 'text-[#8A7969]'}`} strokeWidth={isBookmarked ? 1.5 : 2} />
           </button>
+        </div>
+
+        <div className="flex-grow flex flex-col justify-center py-1 pr-2">
+          <div className="mb-2">
+            <h3 className="text-base font-bold text-[#2C2C2C] leading-tight mb-1 font-serif">{item.name}</h3>
+            {item.desc && <p className="text-[12px] text-[#8A7969] leading-snug line-clamp-2 font-medium">{item.desc}</p>}
+          </div>
+          <div className="mt-auto flex items-center justify-between">
+            <span className="text-[11px] font-bold tracking-wider uppercase text-[#A99F93]">
+              {item.weight || (menuSection === 'bar' ? 'порція' : '100 г')}
+            </span>
+            <span className="text-base font-bold text-[#6A1B29] bg-[#FFF5F6] px-3 py-1 rounded-full whitespace-nowrap">
+              {formatPrice(item.price)}
+            </span>
+          </div>
         </div>
       </div>
     );
@@ -460,89 +471,107 @@ export default function App() {
   // ==========================================
   if (view === 'home') {
     return (
-      <div className="min-h-screen w-full bg-[#FDFBF7] font-sans relative text-[#2C2621] shadow-2xl overflow-x-hidden selection:bg-[#E8DCC4] selection:text-[#2C2621]">
+      <div className="min-h-screen w-full bg-[#FDFBF7] font-sans relative text-[#2C2C2C] shadow-2xl overflow-x-hidden selection:bg-[#E8D0C3] selection:text-[#5C3D2E]">
         
         <style dangerouslySetInnerHTML={{__html: `
-          @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;700&family=Montserrat:wght@300;400;500;600;700&display=swap');
-          .font-handwriting { font-family: 'Dancing Script', cursive; }
+          @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap');
+          .font-serif { font-family: 'Playfair Display', serif; }
           .font-sans { font-family: 'Montserrat', sans-serif; }
         `}} />
 
-        <div className="h-[50vh] lg:h-[60vh] w-full bg-cover bg-center relative" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=1920&q=80)' }}>
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-[#FDFBF7]"></div>
-          <div className="absolute inset-0 flex flex-col justify-center items-center z-10 p-6">
-            <h1 className="text-6xl lg:text-8xl font-handwriting font-bold tracking-wide text-white drop-shadow-lg mb-2">Romantic</h1>
-            <div className="flex items-center justify-center gap-4 opacity-90">
-              <span className="w-12 h-[1px] bg-white/60"></span>
-              <p className="text-xs lg:text-sm tracking-[0.3em] uppercase text-white font-medium">Ресторан • Бар</p>
-              <span className="w-12 h-[1px] bg-white/60"></span>
+        <div className="h-[300px] w-full bg-cover bg-center relative" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1514933651103-005eec06c04b?auto=format&fit=crop&w=1000&q=80)' }}>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-transparent backdrop-blur-[1px]"></div>
+          
+          <div className="absolute top-0 w-full p-5 flex justify-center items-start z-10">
+            <div className="text-white text-center mx-auto mt-4">
+              <p className="text-[10px] tracking-[0.3em] uppercase text-white/70 font-medium">Ресторан • Піцерія • Бар</p>
+              <h1 className="text-4xl font-serif italic tracking-wide mt-1 mb-1">Romantic</h1>
+              <div className="flex items-center justify-center gap-2">
+                <span className="w-4 h-[1px] bg-white/50"></span>
+                <p className="text-[9px] tracking-[0.2em] uppercase text-white/80">restaurant</p>
+                <span className="w-4 h-[1px] bg-white/50"></span>
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="relative -mt-16 lg:-mt-24 px-4 pb-20 z-20 max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="relative -mt-16 px-4 pb-12 max-w-md mx-auto z-20">
           
-          <div className="bg-white/95 backdrop-blur-xl rounded-[2rem] p-8 shadow-xl border border-[#E8DCC4]/40 flex flex-col justify-center items-center text-center lg:col-span-1">
-            <div className="w-24 h-24 rounded-full border-[4px] border-white bg-[#FCFAF8] text-[#967259] flex items-center justify-center shadow-md mb-4">
-              <span className="font-handwriting text-5xl font-bold leading-none pt-2">R</span>
+          <div className="bg-white rounded-[2rem] p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] mb-6 relative pt-14 border border-[#F0EBE1]">
+            <div className="absolute -top-12 left-6">
+              <div className="w-24 h-24 rounded-full border-[6px] border-white bg-[#6A1B29] text-[#FDFBF7] flex items-center justify-center shadow-md overflow-hidden relative">
+                <span className="text-center leading-none tracking-widest font-serif text-lg italic z-10">ROM<br/>ANTIC</span>
+              </div>
             </div>
-            <h2 className="text-3xl font-bold text-[#2C2621] mb-2">Romantic</h2>
-            <p className="text-[#8A7969] font-medium flex items-center gap-1.5 mt-2">
-              <MapPin className="w-4 h-4 text-[#967259]" />
-              с. Строїнці
+
+            <h2 className="text-3xl font-serif font-semibold text-[#2C2C2C] mt-1">Romantic</h2>
+            <p className="text-[#8A7969] text-sm mt-1.5 font-medium flex items-center gap-1.5">
+              <MapPin className="w-4 h-4 text-[#6A1B29]" /> с. Строїнці
             </p>
           </div>
 
-          <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <button onClick={() => handleOpenMenu('food')} className="bg-white rounded-[2rem] p-8 flex flex-col items-center justify-center gap-4 shadow-lg border border-[#E8DCC4]/40 hover:border-[#967259]/40 hover:-translate-y-1 transition-all group">
-              <div className="w-16 h-16 rounded-full bg-[#FCFAF8] text-[#967259] flex items-center justify-center group-hover:scale-110 transition-transform shadow-inner text-3xl">
-                <Utensils className="w-8 h-8" />
+          <div className="flex gap-3 mb-8">
+            <button onClick={() => handleOpenMenu('food')} className="flex-1 bg-white rounded-[1.5rem] p-5 flex flex-col items-center justify-center gap-3 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-[#F0EBE1] active:scale-[0.98] transition-all hover:border-[#6A1B29]/30 hover:shadow-md group">
+              <div className="w-12 h-12 rounded-full bg-[#FFF5F6] text-[#6A1B29] flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Utensils className="w-6 h-6" />
               </div>
-              <span className="text-sm font-bold tracking-wider uppercase text-[#2C2621]">Кухня</span>
+              <span className="text-lg font-bold text-[#2C2C2C]">Кухня</span>
             </button>
 
-            <button onClick={() => handleOpenMenu('bar')} className="bg-white rounded-[2rem] p-8 flex flex-col items-center justify-center gap-4 shadow-lg border border-[#E8DCC4]/40 hover:border-[#967259]/40 hover:-translate-y-1 transition-all group">
-              <div className="w-16 h-16 rounded-full bg-[#FCFAF8] text-[#967259] flex items-center justify-center group-hover:scale-110 transition-transform shadow-inner text-3xl">
-                <Wine className="w-8 h-8" />
+            <button onClick={() => handleOpenMenu('bar')} className="flex-1 bg-white rounded-[1.5rem] p-5 flex flex-col items-center justify-center gap-3 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-[#F0EBE1] active:scale-[0.98] transition-all hover:border-[#6A1B29]/30 hover:shadow-md group">
+              <div className="w-12 h-12 rounded-full bg-[#FFF5F6] text-[#6A1B29] flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Wine className="w-6 h-6" />
               </div>
-              <span className="text-sm font-bold tracking-wider uppercase text-[#2C2621]">Бар</span>
+              <span className="text-lg font-bold text-[#2C2C2C]">Бар</span>
             </button>
           </div>
 
-          <div className="bg-white rounded-[2rem] p-8 shadow-xl border border-[#E8DCC4]/40 lg:col-span-3 mt-4">
-            <div className="lg:flex lg:justify-between lg:items-center">
-              <div className="lg:w-1/2">
-                <h3 className="text-3xl font-handwriting font-bold text-[#967259] mb-4">Ваше свято</h3>
-                <p className="text-[#5C5146] text-base mb-6 font-medium leading-relaxed max-w-md">
-                  Ми з радістю організуємо та проведемо для Вас найкращі події: <br/>
-                  <span className="font-semibold text-[#2C2621]">Дні народження, Весілля, Сімейні свята.</span>
-                </p>
-              </div>
+          <div className="bg-white rounded-[2rem] p-6 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border border-[#F0EBE1]">
+            <h3 className="text-xl font-serif font-bold text-[#2C2C2C] mb-2 flex items-center gap-2">
+              <Heart className="w-5 h-5 text-[#6A1B29]" /> Про заклад
+            </h3>
+            
+            <p className="text-[#2C2C2C] text-[15px] mb-4 font-semibold">Ми проведемо для Вас найкраще свято:</p>
+            <ul className="text-[#5C5C5C] text-sm space-y-2.5 mb-8 font-medium">
+              <li className="flex items-center gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#6A1B29]"></div> Дні народження
+              </li>
+              <li className="flex items-center gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#6A1B29]"></div> Весілля
+              </li>
+              <li className="flex items-center gap-3">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#6A1B29]"></div> Сімейні свята
+              </li>
+            </ul>
 
-              <div className="space-y-6 pt-6 lg:pt-0 lg:w-1/2 border-t lg:border-t-0 lg:border-l border-[#F3EFEA] lg:pl-12">
-                <div className="flex gap-5 items-center">
-                  <div className="w-12 h-12 rounded-full bg-[#FCFAF8] flex items-center justify-center border border-[#F3EFEA]">
-                    <Phone className="text-[#967259] w-5 h-5" />
-                  </div>
-                  <div>
-                    <p className="text-[#A99F93] text-xs uppercase tracking-widest font-bold mb-1">Телефон</p>
-                    <a href="tel:+380997272881" className="text-[#2C2621] text-lg font-bold hover:text-[#967259] transition-colors">+380 99 727 28 81</a>
-                  </div>
+            <div className="space-y-6">
+              <div className="flex gap-4 items-start">
+                <div className="w-10 h-10 rounded-full bg-[#FDFBF7] flex items-center justify-center flex-shrink-0 border border-[#F0EBE1]">
+                  <MapPin className="text-[#6A1B29] w-4 h-4" />
                 </div>
-                <div className="flex gap-5 items-center">
-                  <div className="w-12 h-12 rounded-full bg-[#FCFAF8] flex items-center justify-center border border-[#F3EFEA]">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#967259] w-5 h-5">
-                      <rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect>
-                      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                      <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line>
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-[#A99F93] text-xs uppercase tracking-widest font-bold mb-1">Instagram</p>
-                    <a href="https://www.instagram.com/romantic_restaurant_strointsi" target="_blank" rel="noopener noreferrer" className="text-[#2C2621] text-lg font-bold hover:text-[#967259] transition-colors line-clamp-1">
-                      @romantic_restaurant_strointsi
-                    </a>
-                  </div>
+                <div>
+                  <p className="text-[#A99F93] text-[10px] uppercase tracking-widest font-bold mb-1">Адреса</p>
+                  <p className="text-[#2C2C2C] font-semibold text-sm">с. Строїнці</p>
+                </div>
+              </div>
+              <div className="flex gap-4 items-start">
+                <div className="w-10 h-10 rounded-full bg-[#FDFBF7] flex items-center justify-center flex-shrink-0 border border-[#F0EBE1]">
+                  <Phone className="text-[#6A1B29] w-4 h-4" />
+                </div>
+                <div>
+                  <p className="text-[#A99F93] text-[10px] uppercase tracking-widest font-bold mb-1">Телефон</p>
+                  <a href="tel:+380997272881" className="text-[#2C2C2C] font-semibold text-sm hover:text-[#6A1B29] transition-colors">+380 99 727 28 81</a>
+                </div>
+              </div>
+              <div className="flex gap-4 items-start">
+                <div className="w-10 h-10 rounded-full bg-[#FDFBF7] flex items-center justify-center flex-shrink-0 border border-[#F0EBE1]">
+                  <Instagram className="text-[#6A1B29] w-4 h-4" />
+                </div>
+                <div>
+                  <p className="text-[#A99F93] text-[10px] uppercase tracking-widest font-bold mb-1">Instagram</p>
+                  <a href="https://www.instagram.com/romantic_restaurant_strointsi" target="_blank" rel="noopener noreferrer" className="text-[#2C2621] text-sm font-semibold hover:text-[#6A1B29] transition-colors block truncate">
+                    @romantic_restaurant
+                  </a>
                 </div>
               </div>
             </div>
@@ -556,193 +585,171 @@ export default function App() {
   // ЕКРАН 2: МЕНЮ
   // ==========================================
   return (
-    <div className="min-h-screen w-full bg-[#F3F4F6] text-[#111827] font-sans relative mx-auto max-w-md shadow-2xl">
+    <div className="min-h-screen w-full bg-[#FDFBF7] text-[#2C2C2C] font-sans relative mx-auto max-w-md shadow-2xl pb-10">
       
       <style dangerouslySetInnerHTML={{__html: `
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap');
+        .font-serif { font-family: 'Playfair Display', serif; }
+        .font-sans { font-family: 'Montserrat', sans-serif; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        body { background-color: #F3F4F6; margin: 0; }
+        html { scroll-behavior: smooth; }
+        body { background-color: #FDFBF7; margin: 0; }
       `}} />
 
       {/* HEADER (Sticky) */}
-      <div className="sticky top-0 z-40 bg-[#F3F4F6] pt-4 pb-2 w-full">
-        <div className="px-4">
-          <div className="flex items-center justify-between mb-4">
-            
-            <button 
-              onClick={() => setView('home')} 
-              className="w-10 h-10 rounded-full bg-[#8B4513] text-white flex-shrink-0 flex items-center justify-center font-serif text-[9px] shadow-sm leading-tight text-center active:scale-95 transition-transform"
-            >
-              ROM<br/>ANTIC
-            </button>
-            
-            <div className="flex items-center gap-2 justify-end flex-grow ml-2">
-              {isSearchActive ? (
-                <div className="relative w-full max-w-[200px] animate-in fade-in zoom-in-95 duration-200">
-                  <input 
-                    autoFocus
-                    type="text" 
-                    placeholder="Пошук..." 
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full h-10 bg-white border border-gray-200 rounded-full text-[15px] outline-none pl-10 pr-10 shadow-sm"
-                  />
-                  <Search className="absolute left-3.5 top-3 w-4 h-4 text-[#9CA3AF]" />
-                  <button 
-                    onClick={() => { setIsSearchActive(false); setSearchQuery(''); }} 
-                    className="absolute right-3.5 top-3 text-[#9CA3AF] hover:text-[#111827]"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
-              ) : (
-                <button 
-                  onClick={() => setIsSearchActive(true)}
-                  className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center text-[#4B5563] shadow-sm active:bg-gray-50 transition-colors"
-                >
-                  <Search className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-          </div>
-
-          <button 
-            onClick={() => setShowSectionModal(true)}
-            className="w-full bg-[#E5E7EB] border border-transparent hover:bg-[#D1D5DB] rounded-xl py-3 px-4 flex items-center justify-between mb-3 active:scale-[0.99] transition-all"
-          >
-            <span className="font-semibold text-[16px] text-[#111827]">{menuSection === 'food' ? 'Кухня' : 'Бар'}</span>
-            <ChevronRight className="w-5 h-5 text-[#6B7280]" />
+      <header className="bg-white sticky top-0 z-30 shadow-[0_4px_20px_rgb(0,0,0,0.02)] border-b border-[#F0EBE1]">
+        <div className="flex items-center justify-between px-4 py-4">
+          <button onClick={() => setView('home')} className="w-10 h-10 rounded-full bg-[#FDFBF7] border border-[#F0EBE1] flex items-center justify-center text-[#5C5C5C] hover:text-[#2C2C2C] hover:border-[#2C2C2C] transition-all">
+            <ArrowLeft className="w-5 h-5" />
           </button>
+          
+          <div className="flex bg-[#F4F4F5] p-1 rounded-full w-48 mx-4">
+            <button onClick={() => handleSectionSwitch('food')} className={`flex-1 text-xs font-bold uppercase tracking-wider py-2 rounded-full transition-all duration-300 ${menuSection === 'food' ? 'bg-[#6A1B29] text-white shadow-md' : 'text-[#8A7969]'}`}>Кухня</button>
+            <button onClick={() => handleSectionSwitch('bar')} className={`flex-1 text-xs font-bold uppercase tracking-wider py-2 rounded-full transition-all duration-300 ${menuSection === 'bar' ? 'bg-[#6A1B29] text-white shadow-md' : 'text-[#8A7969]'}`}>Бар</button>
+          </div>
+          <div className="w-10"></div>
         </div>
 
         {/* Горизонтальний скрол категорій */}
         {!searchQuery && (
-          <div id="tabs-container" className="flex overflow-x-auto gap-2 px-4 no-scrollbar pb-2 pt-1">
-            <button
-              id="tab-favorites"
-              onClick={() => scrollToCategory('favorites')}
-              className={`px-4 py-2 rounded-full text-[14px] font-semibold transition-colors flex items-center justify-center flex-shrink-0 border ${
-                activeCategory === 'favorites' 
-                  ? 'bg-[#5B3BA8] text-white border-[#5B3BA8]' 
-                  : 'bg-[#F3F4F6] text-[#4B5563] border-transparent hover:bg-gray-200'
-              }`}
-            >
-              <Bookmark className={`w-4 h-4 ${activeCategory === 'favorites' ? 'fill-white' : ''}`} strokeWidth={activeCategory === 'favorites' ? 1.5 : 2}/>
-            </button>
-            
-            {currentSectionCategories.map((cat) => {
-              const isActive = activeCategory === cat.id;
-              return (
-                <button
-                  key={cat.id}
-                  id={`tab-${cat.id}`}
-                  onClick={() => scrollToCategory(cat.id)}
-                  className={`px-5 py-2 rounded-full text-[14px] font-semibold transition-colors flex-shrink-0 border ${
-                    isActive 
-                      ? 'bg-[#5B3BA8] text-white border-[#5B3BA8]' 
-                      : 'bg-[#F3F4F6] text-[#4B5563] border-transparent hover:bg-gray-200'
-                  }`}
-                >
-                  {cat.name}
-                </button>
-              );
-            })}
-          </div>
-        )}
-      </div>
-
-      {/* ОСНОВНА ЧАСТИНА (Список страв) */}
-      <div className="px-4 pt-4 pb-24 bg-white rounded-t-3xl min-h-screen">
-        
-        {/* Банер (лише коли не пошук і не вибране) */}
-        {activeCategory !== 'favorites' && !searchQuery && (
-          <div className="w-full bg-[#111827] rounded-[1.2rem] mb-8 overflow-hidden relative shadow-md mt-4">
-            <div className="relative h-32 w-full">
-              <img 
-                src="https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=800&q=80" 
-                alt="Live Music" 
-                className="w-full h-full object-cover opacity-40 mix-blend-luminosity"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#111827] via-transparent to-transparent"></div>
-              <div className="absolute inset-0 flex flex-col justify-center p-5 text-white">
-                <p className="text-[9px] tracking-[0.2em] uppercase font-semibold text-gray-300 mb-1">Ресторан Romantic</p>
-                <h3 className="text-2xl font-serif italic mb-2">Live Music Night</h3>
-                <div className="flex gap-4 text-xs font-semibold text-gray-400">
-                  <span>Субота - Неділя</span>
-                  <span>18:00</span>
-                </div>
-              </div>
+          <div id="tabs-container" className="overflow-x-auto no-scrollbar scroll-smooth bg-[#FDFBF7]">
+            <div className="flex space-x-2 py-3 px-4 w-max">
+              <button
+                id="tab-favorites"
+                onClick={() => scrollToCategory('favorites')}
+                className={`px-4 py-2 rounded-full text-sm font-semibold transition-all duration-300 border flex items-center justify-center gap-2 ${
+                  activeCategory === 'favorites' 
+                    ? 'bg-[#2C2C2C] text-white border-[#2C2C2C] shadow-md' 
+                    : 'bg-white text-[#5C5C5C] border-[#E8E1D5] hover:border-[#2C2C2C]'
+                }`}
+              >
+                <Bookmark className={`w-4 h-4 ${activeCategory === 'favorites' ? 'fill-white' : ''}`} strokeWidth={activeCategory === 'favorites' ? 1.5 : 2}/>
+              </button>
+              
+              {currentSectionCategories.map((cat) => {
+                const isActive = activeCategory === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    id={`tab-${cat.id}`}
+                    onClick={() => scrollToCategory(cat.id)}
+                    className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 border ${
+                      isActive 
+                        ? 'bg-[#2C2C2C] text-white border-[#2C2C2C] shadow-md' 
+                        : 'bg-white text-[#5C5C5C] border-[#E8E1D5] hover:border-[#2C2C2C]'
+                    }`}
+                  >
+                    {cat.name}
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
+      </header>
+
+      {/* ОСНОВНА ЧАСТИНА (Список страв) */}
+      <main className="max-w-2xl mx-auto px-4 mt-6">
+        
+        <div className="relative mb-8">
+          <input 
+            type="text" 
+            placeholder={`Пошук у розділі "${menuSection === 'food' ? 'Кухня' : 'Бар'}"...`}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-12 pr-10 py-3.5 bg-white border border-[#E8E1D5] rounded-full text-sm font-medium focus:border-[#6A1B29] focus:ring-1 focus:ring-[#6A1B29] focus:outline-none shadow-sm transition-all"
+          />
+          <Search className="absolute left-4 top-3.5 text-[#A99F93] w-5 h-5" />
+          {searchQuery && (
+            <button onClick={() => setSearchQuery('')} className="absolute right-4 top-3.5 text-[#A99F93] hover:text-[#2C2C2C]">
+              <X className="w-5 h-5" />
+            </button>
+          )}
+        </div>
 
         {/* СПИСОК */}
         {searchQuery ? (
           <div>
-            <h2 className="text-[26px] font-bold text-[#111827] mb-6 mt-4">Результати пошуку</h2>
-            <div className="flex flex-col">
-              {currentSectionCategories.flatMap(cat => cat.items.map(item => ({...item, categoryId: cat.id, originalCategory: cat.name})))
+            <div className="flex items-center gap-3 mb-6 px-1">
+              <h2 className="text-3xl font-serif font-bold text-[#2C2C2C]">Результати пошуку</h2>
+            </div>
+            <div className="grid grid-cols-1 gap-4">
+              {currentSectionCategories.flatMap(cat => cat.items.map(item => ({...item, categoryId: cat.id, originalCategory: cat.name, defaultImage: cat.defaultImage})))
                 .filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()) || (item.desc && item.desc.toLowerCase().includes(searchQuery.toLowerCase())))
                 .map((item, idx) => renderItemCard(item, idx, item.categoryId))}
             </div>
+            {currentSectionCategories.flatMap(cat => cat.items.map(item => ({...item, categoryId: cat.id, originalCategory: cat.name})))
+                .filter(item => item.name.toLowerCase().includes(searchQuery.toLowerCase()) || (item.desc && item.desc.toLowerCase().includes(searchQuery.toLowerCase()))).length === 0 && (
+              <div className="text-center py-16 bg-white rounded-[2rem] border border-[#F0EBE1]">
+                  <Search className="w-12 h-12 text-[#E8E1D5] mx-auto mb-3" />
+                  <p className="text-[#8A7969] font-medium">Нічого не знайдено.</p>
+              </div>
+            )}
           </div>
         ) : activeCategory === 'favorites' ? (
           <div>
-            <h2 className="text-[26px] font-bold text-[#111827] mb-6 mt-4">Збережені</h2>
-            <div className="flex flex-col">
-              {currentSectionCategories.flatMap(cat => cat.items.map(item => ({...item, categoryId: cat.id, originalCategory: cat.name})))
+            <div className="flex items-center gap-3 mb-6 px-1">
+              <h2 className="text-3xl font-serif font-bold text-[#2C2C2C]">Збережені</h2>
+              <div className="h-[1px] flex-grow bg-[#E8E1D5] mt-2"></div>
+            </div>
+            <div className="grid grid-cols-1 gap-4">
+              {currentSectionCategories.flatMap(cat => cat.items.map(item => ({...item, categoryId: cat.id, originalCategory: cat.name, defaultImage: cat.defaultImage})))
                 .filter(item => bookmarks.includes(`${item.categoryId}__${item.name}`))
                 .map((item, idx) => renderItemCard(item, idx, item.categoryId))}
             </div>
             {bookmarks.length === 0 && (
-              <div className="text-center py-20 bg-white rounded-[1.2rem] border border-transparent shadow-sm mt-2">
-                <Bookmark className="w-8 h-8 text-gray-300 mx-auto mb-3" strokeWidth={1.5} />
-                <p className="text-[#6B7280] text-sm">Тут поки нічого немає.</p>
+              <div className="text-center py-16 bg-white rounded-[2rem] border border-[#F0EBE1]">
+                <Bookmark className="w-12 h-12 text-[#E8E1D5] mx-auto mb-3" strokeWidth={1.5} />
+                <p className="text-[#8A7969] font-medium">Тут поки нічого немає.</p>
               </div>
             )}
           </div>
         ) : (
           currentSectionCategories.map((category) => (
-            <div key={category.id} id={`cat-${category.id}`} className="mb-10 pt-2 scroll-mt-[180px]">
-              <h2 className="text-[26px] font-bold text-[#111827] mb-5">{category.name}</h2>
-              <div className="flex flex-col">
+            <div key={category.id} id={`cat-${category.id}`} className="mb-10 pt-2 scroll-mt-[160px]">
+              <div className="flex items-center gap-3 mb-6 px-1">
+                <h2 className="text-3xl font-serif font-bold text-[#2C2C2C]">{category.name}</h2>
+                <div className="h-[1px] flex-grow bg-[#E8E1D5] mt-2"></div>
+              </div>
+              <div className="grid grid-cols-1 gap-4">
                 {category.items.map((item, idx) => renderItemCard(item, idx, category.id))}
               </div>
             </div>
           ))
         )}
-      </div>
+      </main>
 
       {/* МОДАЛЬНЕ ВІКНО: Картка Товару (Bottom Sheet) */}
       {selectedItem && (
         <div className="fixed inset-0 z-50 flex items-end justify-center animate-in fade-in duration-200">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setSelectedItem(null)}></div>
-          <div className="bg-white w-full max-w-md rounded-t-[1.5rem] animate-in slide-in-from-bottom-full overflow-hidden flex flex-col max-h-[85vh] z-10 relative">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setSelectedItem(null)}></div>
+          <div className="bg-[#FDFBF7] w-full max-w-md rounded-t-[2rem] animate-in slide-in-from-bottom-full overflow-hidden flex flex-col max-h-[85vh] z-10 relative">
             
             <div className="relative w-full h-64 bg-gray-100">
               <img 
-                src={customImages[`${selectedItem.categoryId}__${selectedItem.name}`] || selectedItem.image || defaultPlaceholder} 
+                src={customImages[`${selectedItem.categoryId}__${selectedItem.name}`] || selectedItem.image || selectedItem.defaultImage || defaultPlaceholder} 
                 alt={selectedItem.name} 
                 className="w-full h-full object-cover" 
               />
               
               <button 
                 onClick={() => setSelectedItem(null)} 
-                className="absolute top-4 right-4 w-9 h-9 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center text-[#111827] shadow-sm hover:bg-white"
+                className="absolute top-4 right-4 w-9 h-9 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center text-[#2C2C2C] shadow-sm hover:bg-white"
               >
                 <X className="w-5 h-5" />
               </button>
               
               {/* Кнопки зміни/видалення фото в модалці */}
               <div className="absolute top-4 left-4 flex gap-2">
-                <label className="w-9 h-9 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center text-[#111827] cursor-pointer shadow-sm hover:bg-white">
+                <label className="w-9 h-9 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center text-[#2C2C2C] cursor-pointer shadow-sm hover:bg-white">
                   <Camera className="w-5 h-5" />
                   <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, `${selectedItem.categoryId}__${selectedItem.name}`)} />
                 </label>
                 {customImages[`${selectedItem.categoryId}__${selectedItem.name}`] && (
                   <button 
                     onClick={() => removeCustomImage(`${selectedItem.categoryId}__${selectedItem.name}`)}
-                    className="w-9 h-9 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center text-red-500 shadow-sm hover:bg-white"
+                    className="w-9 h-9 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center text-[#6A1B29] shadow-sm hover:bg-white"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -751,55 +758,32 @@ export default function App() {
             </div>
 
             <div className="px-6 py-6 flex-1 overflow-y-auto no-scrollbar">
-              <h2 className="text-[22px] font-bold text-[#111827] leading-tight mb-2">{selectedItem.name}</h2>
-              <div className="text-[22px] font-bold text-[#111827] mb-6">{formatPrice(selectedItem.price)}</div>
+              <h2 className="text-[24px] font-serif font-bold text-[#2C2C2C] leading-tight mb-2">{selectedItem.name}</h2>
+              <div className="text-[24px] font-bold text-[#6A1B29] mb-6">{formatPrice(selectedItem.price)}</div>
               
               {selectedItem.desc && (
-                <p className="text-[#4B5563] text-[15px] leading-relaxed mb-6">{selectedItem.desc}</p>
+                <p className="text-[#5C5C5C] text-[15px] font-medium leading-relaxed mb-6">{selectedItem.desc}</p>
               )}
 
               {selectedItem.weight && (
-                <div className="text-[#9CA3AF] text-[14px] font-medium">{selectedItem.weight}</div>
+                <div className="text-[#A99F93] text-[13px] font-bold tracking-wider uppercase">{selectedItem.weight}</div>
               )}
             </div>
 
-            <div className="p-4 bg-white border-t border-gray-100">
+            <div className="p-5 bg-white border-t border-[#F0EBE1]">
               <button 
                 onClick={() => {
                   toggleBookmark(selectedItem.categoryId, selectedItem.name);
                   setSelectedItem(null);
                 }}
-                className={`w-full py-3.5 rounded-xl flex items-center justify-center gap-2 font-bold text-[16px] transition-colors ${
+                className={`w-full py-4 rounded-full flex items-center justify-center gap-2 font-bold text-[16px] transition-colors ${
                   bookmarks.includes(`${selectedItem.categoryId}__${selectedItem.name}`)
-                    ? 'bg-gray-100 text-[#111827]'
-                    : 'bg-[#5B3BA8] text-white'
+                    ? 'bg-[#F8F6F0] text-[#8A7969] border border-[#E8E1D5]'
+                    : 'bg-[#6A1B29] text-white shadow-md'
                 }`}
               >
-                <Bookmark className={`w-5 h-5 ${bookmarks.includes(`${selectedItem.categoryId}__${selectedItem.name}`) ? 'fill-[#111827]' : ''}`} />
+                <Bookmark className={`w-5 h-5 ${bookmarks.includes(`${selectedItem.categoryId}__${selectedItem.name}`) ? 'fill-[#8A7969]' : ''}`} />
                 {bookmarks.includes(`${selectedItem.categoryId}__${selectedItem.name}`) ? 'Видалити із закладок' : 'Додати в закладки'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* МОДАЛЬНЕ ВІКНО: Вибір розділу (Кухня / Бар) */}
-      {showSectionModal && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center animate-in fade-in duration-200">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setShowSectionModal(false)}></div>
-          <div className="bg-[#F3F4F6] w-full max-w-md rounded-t-[1.5rem] p-4 pb-8 animate-in slide-in-from-bottom-10 z-10 relative">
-            <div className="flex items-center justify-between mb-4 px-2 pt-2">
-              <h3 className="text-[20px] font-bold text-[#111827]">Розділи меню</h3>
-              <button onClick={() => setShowSectionModal(false)} className="p-1 rounded-full text-gray-500 hover:bg-gray-200"><X className="w-6 h-6" /></button>
-            </div>
-            <div className="space-y-2.5">
-              <button onClick={() => handleSectionSwitch('food')} className={`w-full p-4 rounded-[1.2rem] flex items-center justify-between transition-all bg-white shadow-sm active:bg-gray-50`}>
-                <span className="font-bold text-[17px] text-[#111827]">Кухня</span>
-                <ChevronRight className="w-5 h-5 text-gray-400" />
-              </button>
-              <button onClick={() => handleSectionSwitch('bar')} className={`w-full p-4 rounded-[1.2rem] flex items-center justify-between transition-all bg-white shadow-sm active:bg-gray-50`}>
-                <span className="font-bold text-[17px] text-[#111827]">Бар</span>
-                <ChevronRight className="w-5 h-5 text-gray-400" />
               </button>
             </div>
           </div>
