@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { 
   Search, Bookmark, X, MapPin, 
   Phone, ChevronRight, ArrowLeft,
-  Utensils, Wine, Instagram
+  Utensils, Wine,
 } from 'lucide-react';
 
 // --- ДАНІ МЕНЮ ---
@@ -410,7 +410,7 @@ export default function App() {
                 </div>
               </div>
               <div className="flex gap-4 items-start">
-                <Instagram className="text-[#111827] w-6 h-6 mt-0.5" strokeWidth={1.5} />
+                <Phone className="text-[#111827] w-6 h-6 mt-0.5" strokeWidth={1.5} />
                 <div className="pt-0.5 w-[80%]">
                   <p className="text-[#9CA3AF] text-[11px] uppercase tracking-wide font-semibold mb-0.5">Instagram</p>
                   <a href="https://www.instagram.com/romantic_restaurant_strointsi" target="_blank" rel="noopener noreferrer" className="text-[#111827] font-medium text-[15px] hover:underline block truncate">
